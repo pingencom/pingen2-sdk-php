@@ -1,6 +1,7 @@
 {
     "name": "pingencom/pingen2-sdk-php",
     "type": "library",
+    "license": "BSD-3-Clause",
     "description": "Official PHP Pingen SDK for API V2",
     "require": {
         "php": "^7.4",
