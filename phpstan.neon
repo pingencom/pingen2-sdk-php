@@ -1,0 +1,7 @@
+parameters:
+  paths:
+    - src
+  level: 8
+  checkMissingIterableValueType: false
+  ignoreErrors:
+    - '#PHPDoc tag @param for parameter \$token with type League\\OAuth2\\Client\\Token\\AccessTokenInterface is not subtype of native type League\\OAuth2\\Client\\Token\\AccessToken.#'

@@ -1,0 +1,72 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkoud code
+      uses: actions/checkout@v2
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        tools: composer:v2
+        ini-values: pcov.directory=., pcov.exclue=\"~vendor~\"
+        coverage: pcov
+
+    - name: Setup problem matchers for PHPUnit
+      run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v2
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install dependencies
+      if: steps.composer-cache.outputs.cache-hit != 'true'
+      run: composer install --prefer-dist --no-progress --no-suggest
+
+    - name: Run lint check
+      run: vendor/bin/parallel-lint --exclude vendor .
+
+    - name: Run ECS check
+      run: vendor/bin/ecs check src
+
+    - name: Run phpstan check
+      run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=512M
+
+    - name: Run tests with coverage
+      id: tests
+      run: |
+        vendor/bin/phpunit
+        cat coverage/text
+        [ -z "$(cat coverage/text | grep 'Classes: 100.00%')" ] && echo ::warning::$(cat coverage/text)
+
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage-report
+        path: coverage/html
+
+#    In future we will enforce 100% code coverage (with allowed @codeCoverageIgnore)
+#    When ready, enable clover in phpunit.xml
+#    - name: Check test coverage
+#      id: test-coverage
+#      uses: johanvanhelden/gha-clover-test-coverage-check@v1
+#      with:
+#        percentage: 100
+#        filename: ./coverage/clover.xml
