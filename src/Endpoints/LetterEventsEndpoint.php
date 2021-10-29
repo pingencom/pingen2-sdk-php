@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Pingen\Endpoints;
 
-use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollectionItem;
 use Pingen\Endpoints\DataTransferObjects\LetterEvent\LetterEventCollection;
-use Pingen\Endpoints\ParameterBags\LetterCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\LetterEventCollectionParameterBag;
 use Pingen\Exceptions\RateLimitJsonApiException;
 use Pingen\ResourceEndpoint;
