@@ -38,32 +38,4 @@ class LetterEventsEndpoint extends ResourceEndpoint
                 )->json()
         );
     }
-
-    /**
-     * @param LetterCollectionParameterBag|null $listParameterBag
-     * @return \Generator|LetterCollectionItem[]
-     * @throws \Illuminate\Http\Client\RequestException
-     */
-    public function iterateOverCollection(?LetterCollectionParameterBag $listParameterBag = null)
-    {
-        if ($listParameterBag === null) {
-            $listParameterBag = new LetterCollectionParameterBag();
-        }
-
-        try {
-            do {
-                $collection = $this->getCollection($listParameterBag);
-
-                foreach ($collection->data as $collectionItem) {
-                    yield $collectionItem;
-                }
-
-                $listParameterBag->setPageNumber($collection->meta->current_page + 1);
-            } while ($collection->links->next);
-        } catch (RateLimitJsonApiException $rateLimitJsonApiException) {
-            sleep($rateLimitJsonApiException->retryAfter);
-
-            $this->iterateOverCollection($listParameterBag);
-        }
-    }
 }
