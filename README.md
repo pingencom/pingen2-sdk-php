@@ -24,6 +24,7 @@ This SDK supports staging as well. **When initiating the provider** (see Usage),
 The simplest way to integrate is using the client credentials grant (see https://api.v2.pingen.com/documentation#section/Authentication/How-to-obtain-a-Client-ID)
 
 ```php
+require __DIR__ . '/vendor/autoload.php';
 
 $provider = new \Pingen\Provider\Pingen(
     array(
