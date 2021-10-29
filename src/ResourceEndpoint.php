@@ -192,6 +192,7 @@ abstract class ResourceEndpoint
     {
         return $this->getHttpClient()
             ->timeout(self::DEFAULT_REQUEST_TIMEOUT)
+            ->withUserAgent('PINGEN.SDK.PHP')
             ->withToken($this->getAccessToken()->getToken());
     }
 
