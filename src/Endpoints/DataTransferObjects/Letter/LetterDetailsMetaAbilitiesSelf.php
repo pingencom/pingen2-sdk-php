@@ -16,5 +16,5 @@ class LetterDetailsMetaAbilitiesSelf extends DataTransferObject
 
     public string $delete;
 
-    public string $send;
+    public string $submit;
 }
