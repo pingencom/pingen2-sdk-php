@@ -1,11 +1,15 @@
-# Beta notes / Important information
+# Important information
 
 This SDK uses the new API V2 of pingen v2. Pingen v2 does not share any data with v1 and therefore separate accounts
-are required. Currently V2 is still in beta and will be released to the general public in the summer of 2021.
-
-To access V2 you need to be invited and receive oauth2 credentials.
+are required.
 
 If you are looking for the SDK for pingen v1, please visit this repository: https://github.com/pingencom/pingen
+
+# Requirements
+
+You need to have an account in pingen v2 and obtain oauth credentials for your desired grant type (usually client_credentials).
+
+How to obtain these are described here: https://api.v2.pingen.com/documentation#section/Authentication/How-to-obtain-a-Client-ID
 
 # Installation
 
@@ -21,7 +25,7 @@ This SDK supports staging as well. **When initiating the provider** (see Usage),
 
 # Usage
 
-The simplest way to integrate is using the client credentials grant (see https://api.v2.pingen.com/documentation#section/Authentication/How-to-obtain-a-Client-ID)
+The simplest way to integrate is using the client credentials grant (see https://api.v2.pingen.com/documentation#section/Authentication/Which-grant-type-should-i-use)
 
 ```php
 require __DIR__ . '/vendor/autoload.php';
