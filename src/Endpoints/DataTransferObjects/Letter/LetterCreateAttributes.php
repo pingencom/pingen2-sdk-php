@@ -7,7 +7,7 @@ namespace Pingen\Endpoints\DataTransferObjects\Letter;
 use Pingen\Support\Input;
 
 /**
- * Class LetterInputPOSTAttributes
+ * Class LetterCreateAttributes
  * @package Pingen\DataTransferObjects\Letter
  *
  * @method LetterCreateAttributes setFileUrl(string $value)

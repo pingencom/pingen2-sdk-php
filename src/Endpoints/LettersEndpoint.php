@@ -8,6 +8,7 @@ use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollection;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollectionItem;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterDetails;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterSendAttributes;
 use Pingen\Endpoints\ParameterBags\LetterCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\LetterParameterBag;
 use Pingen\Exceptions\RateLimitJsonApiException;
@@ -114,10 +115,29 @@ class LettersEndpoint extends ResourceEndpoint
     public function create(LetterCreateAttributes $letterCreateAttributes): LetterDetails
     {
         return new LetterDetails(
-            $this->performPostJonApiRequest(
+            $this->performPostRequest(
                 sprintf('/organisations/%s/letters/', $this->getOrganisationId()),
                 'letters',
                 $letterCreateAttributes
+            )->json()
+        );
+    }
+
+    /**
+     * @param string $letterId
+     * @param LetterSendAttributes $letterSendAttributes
+     * @return LetterDetails
+     * @throws RateLimitJsonApiException
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function send(string $letterId, LetterSendAttributes $letterSendAttributes): LetterDetails
+    {
+        return new LetterDetails(
+            $this->performPatchRequest(
+                sprintf('/organisations/%s/letters/%s/send', $this->getOrganisationId(), $letterId),
+                'letters',
+                $letterId,
+                $letterSendAttributes
             )->json()
         );
     }
