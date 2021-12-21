@@ -158,7 +158,7 @@ abstract class ResourceEndpoint
      * @throws \Illuminate\Http\Client\RequestException
      * @throws RateLimitJsonApiException
      */
-    protected function performPostJonApiRequest(string $endpoint, string $type, Input $body)
+    protected function performPostRequest(string $endpoint, string $type, Input $body)
     {
         return $this->setOnErrorCallbackForJsonApiResponses(
             $this->getAuthenticatedJsonApiRequest()
@@ -166,6 +166,31 @@ abstract class ResourceEndpoint
                     $this->getResourceBaseUrl() . $endpoint,
                     [
                         'data' => [
+                            'type' => $type,
+                            'attributes' => $body->toArray(),
+                        ],
+                    ]
+                )
+        );
+    }
+
+    /**
+     * @param string $endpoint
+     * @param string $type
+     * @param string $id
+     * @param Input $body
+     * @return Response
+     * @throws JsonApiException
+     */
+    protected function performPatchRequest(string $endpoint, string $type, string $id, Input $body)
+    {
+        return $this->setOnErrorCallbackForJsonApiResponses(
+            $this->getAuthenticatedJsonApiRequest()
+                ->patch(
+                    $this->getResourceBaseUrl() . $endpoint,
+                    [
+                        'data' => [
+                            'id' => $id,
                             'type' => $type,
                             'attributes' => $body->toArray(),
                         ],

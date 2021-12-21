@@ -5,5 +5,4 @@ vendor/
 coverage/
 composer.lock
 composer.phar
-examples/
 docker-compose.yml
