@@ -25,7 +25,7 @@ class Pingen extends AbstractProvider
 
     protected string $authBaseUrlProduction = 'https://identity.pingen.com';
 
-    protected string $authBaseUrlStaging = 'https://identity-integration.pingen.com';
+    protected string $authBaseUrlStaging = 'https://identity-staging.pingen.com';
 
     protected bool $useStaging = false;
 
