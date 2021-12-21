@@ -152,6 +152,22 @@ abstract class ResourceEndpoint
 
     /**
      * @param string $endpoint
+     * @return Response
+     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RateLimitJsonApiException
+     */
+    protected function performGetRequest(string $endpoint): Response
+    {
+        return $this->setOnErrorCallbackForJsonApiResponses(
+            $this->getAuthenticatedJsonApiRequest()
+                ->get(
+                    $this->getResourceBaseUrl() . $endpoint
+                )
+        );
+    }
+
+    /**
+     * @param string $endpoint
      * @param string $type
      * @param Input $body
      * @return Response

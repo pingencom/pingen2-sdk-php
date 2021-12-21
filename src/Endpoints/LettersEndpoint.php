@@ -189,4 +189,28 @@ class LettersEndpoint extends ResourceEndpoint
             sprintf('/organisations/%s/letters/%s', $this->getOrganisationId(), $letterId)
         );
     }
+
+    /**
+     * @param string $letterId
+     * @return resource
+     * @throws RateLimitJsonApiException
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function getFile(string $letterId)
+    {
+        $response = $this->performGetRequest(
+            sprintf('/organisations/%s/letters/%s/file', $this->getOrganisationId(), $letterId)
+        );
+
+        $tmpFile = tmpfile();
+
+        if (! is_resource($tmpFile)) {
+            throw new \RuntimeException('Cannot create tmp file.');
+        }
+
+        fwrite($tmpFile, $response->body());
+        rewind($tmpFile);
+
+        return $tmpFile;
+    }
 }
