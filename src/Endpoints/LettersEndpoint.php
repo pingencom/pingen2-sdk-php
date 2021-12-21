@@ -8,6 +8,7 @@ use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollection;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollectionItem;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterDetails;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterEditAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterSendAttributes;
 use Pingen\Endpoints\ParameterBags\LetterCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\LetterParameterBag;
@@ -139,6 +140,53 @@ class LettersEndpoint extends ResourceEndpoint
                 $letterId,
                 $letterSendAttributes
             )->json()
+        );
+    }
+
+    /**
+     * @param string $letterId
+     * @param LetterEditAttributes $letterEditAttributes
+     * @return LetterDetails
+     * @throws RateLimitJsonApiException
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function edit(string $letterId, LetterEditAttributes $letterEditAttributes): LetterDetails
+    {
+        return new LetterDetails(
+            $this->performPatchRequest(
+                sprintf('/organisations/%s/letters/%s', $this->getOrganisationId(), $letterId),
+                'letters',
+                $letterId,
+                $letterEditAttributes
+            )->json()
+        );
+    }
+
+    /**
+     * @param string $letterId
+     * @return void
+     * @throws RateLimitJsonApiException
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function cancel(string $letterId): void
+    {
+        $this->performPatchRequest(
+            sprintf('/organisations/%s/letters/%s/cancel', $this->getOrganisationId(), $letterId),
+            'letters',
+            $letterId
+        );
+    }
+
+    /**
+     * @param string $letterId
+     * @return void
+     * @throws RateLimitJsonApiException
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function delete(string $letterId): void
+    {
+        $this->performDeleteRequest(
+            sprintf('/organisations/%s/letters/%s', $this->getOrganisationId(), $letterId)
         );
     }
 }

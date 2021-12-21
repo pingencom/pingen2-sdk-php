@@ -176,25 +176,46 @@ abstract class ResourceEndpoint
 
     /**
      * @param string $endpoint
+     * @return Response
+     * @throws JsonApiException
+     */
+    protected function performDeleteRequest(string $endpoint)
+    {
+        return $this->setOnErrorCallbackForJsonApiResponses(
+            $this->getAuthenticatedJsonApiRequest()
+                ->delete(
+                    $this->getResourceBaseUrl() . $endpoint
+                )
+        );
+    }
+
+    /**
+     * @param string $endpoint
      * @param string $type
      * @param string $id
      * @param Input $body
      * @return Response
      * @throws JsonApiException
      */
-    protected function performPatchRequest(string $endpoint, string $type, string $id, Input $body)
+    protected function performPatchRequest(string $endpoint, string $type, string $id, Input $body = null)
     {
+        $data = [];
+
+        if ($body !== null) {
+            $data = [
+                'data' => [
+                    'id' => $id,
+                    'type' => $type,
+                    'attributes' => $body->toArray(),
+                ],
+            ];
+        }
+
         return $this->setOnErrorCallbackForJsonApiResponses(
             $this->getAuthenticatedJsonApiRequest()
                 ->patch(
                     $this->getResourceBaseUrl() . $endpoint,
-                    [
-                        'data' => [
-                            'id' => $id,
-                            'type' => $type,
-                            'attributes' => $body->toArray(),
-                        ],
-                    ]
+                    $data
                 )
         );
     }
