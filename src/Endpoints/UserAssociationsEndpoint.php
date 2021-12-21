@@ -40,23 +40,26 @@ class UserAssociationsEndpoint extends ResourceEndpoint
      * @return \Generator|UserAssociationsCollectionItem[]
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function collectAll(?UserAssociationCollectionParameterBag $listParameterBag = null)
+    public function iterateOverCollection(?UserAssociationCollectionParameterBag $listParameterBag = null)
     {
+        if ($listParameterBag === null) {
+            $listParameterBag = new UserAssociationCollectionParameterBag();
+        }
+
         try {
             do {
-                $associations = $this->getCollection($listParameterBag);
+                $collection = $this->getCollection($listParameterBag);
 
-                foreach ($associations->data as $userAssociationItem) {
-                    yield $userAssociationItem;
+                foreach ($collection->data as $collectionItem) {
+                    yield $collectionItem;
                 }
 
-                $listParameterBag = ($listParameterBag ?? new UserAssociationCollectionParameterBag())
-                    ->setPageNumber($associations->meta->current_page + 1);
-            } while ($associations->links->next);
+                $listParameterBag->setPageNumber($collection->meta->current_page + 1);
+            } while ($collection->links->next);
         } catch (RateLimitJsonApiException $rateLimitJsonApiException) {
             sleep($rateLimitJsonApiException->retryAfter);
 
-            $this->collectAll($listParameterBag);
+            $this->iterateOverCollection($listParameterBag);
         }
     }
 
