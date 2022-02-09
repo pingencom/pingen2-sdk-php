@@ -4,7 +4,7 @@
     "license": "BSD-3-Clause",
     "description": "Official PHP Pingen SDK for API V2",
     "require": {
-        "php": "^7.4",
+        "php": "^7.4|^8.0",
         "ext-json": "*",
         "league/oauth2-client": "^2.6",
         "illuminate/support": "^8.17",
