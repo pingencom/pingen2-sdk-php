@@ -27,9 +27,9 @@ class UserAssociationCollectionParameterBag extends CollectionParameterBag
      * @param array $fields
      * @return UserAssociationCollectionParameterBag
      */
-    public function setFieldsCompany(array $fields): self
+    public function setFieldsOrganisations(array $fields): self
     {
-        $this->set('fields[companies]', collect($fields)->join(','));
+        $this->set('fields[organisations]', collect($fields)->join(','));
 
         return $this;
     }
