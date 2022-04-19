@@ -108,15 +108,15 @@ class WebhooksEndpoint extends ResourceEndpoint
     }
 
     /**
-     * @param string $letterId
+     * @param string $webhookId
      * @return void
      * @throws RateLimitJsonApiException
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function delete(string $letterId): void
+    public function delete(string $webhookId): void
     {
         $this->performDeleteRequest(
-            sprintf('/organisations/%s/webhooks/%s', $this->getOrganisationId(), $letterId)
+            sprintf('/organisations/%s/webhooks/%s', $this->getOrganisationId(), $webhookId)
         );
     }
 }
