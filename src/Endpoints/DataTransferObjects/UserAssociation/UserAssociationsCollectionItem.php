@@ -17,6 +17,8 @@ class UserAssociationsCollectionItem extends DataTransferObject
 
     public string $id;
 
+    public array $meta;
+
     public UserAssociationAttributes $attributes;
 
     public ?ItemLinks $links;
