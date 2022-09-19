@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pingen\Endpoints\DataTransferObjects\UserAssociation;
 
 use Pingen\Endpoints\DataTransferObjects\General\ItemLinks;
-use Spatie\DataTransferObject\DataTransferObject;
+use Pingen\Support\DataTransferObject;
 
 /**
  * Class UserAssociationItem
