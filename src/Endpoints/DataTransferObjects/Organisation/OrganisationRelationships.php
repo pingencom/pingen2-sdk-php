@@ -14,6 +14,4 @@ use Pingen\Support\DataTransferObject;
 class OrganisationRelationships extends DataTransferObject
 {
     public RelationshipRelatedMany $associations;
-
-    public RelationshipRelatedMany $letters;
 }
