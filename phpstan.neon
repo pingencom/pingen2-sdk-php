@@ -3,5 +3,6 @@ parameters:
     - src
   level: 8
   checkMissingIterableValueType: false
+  checkGenericClassInNonGenericObjectType: false
   ignoreErrors:
     - '#PHPDoc tag @param for parameter \$token with type League\\OAuth2\\Client\\Token\\AccessTokenInterface is not subtype of native type League\\OAuth2\\Client\\Token\\AccessToken.#'
