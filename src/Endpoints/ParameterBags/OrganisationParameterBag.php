@@ -7,7 +7,7 @@ namespace Pingen\Endpoints\ParameterBags;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
- * Class CompanyParameterBag
+ * Class OrganisationParameterBag
  * @package Pingen\Endpoints\ParameterBags
  */
 class OrganisationParameterBag extends ParameterBag

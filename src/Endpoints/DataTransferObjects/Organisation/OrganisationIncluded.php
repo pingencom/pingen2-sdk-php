@@ -8,7 +8,7 @@ use Pingen\Endpoints\DataTransferObjects\General\ItemLinks;
 use Pingen\Support\DataTransferObject;
 
 /**
- * Class CompanyItem
+ * Class OrganisationIncluded
  * @package Pingen\Models
  */
 class OrganisationIncluded extends DataTransferObject

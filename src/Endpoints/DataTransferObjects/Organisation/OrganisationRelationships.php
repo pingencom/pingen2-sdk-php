@@ -8,7 +8,7 @@ use Pingen\Endpoints\DataTransferObjects\General\RelationshipRelatedMany;
 use Pingen\Support\DataTransferObject;
 
 /**
- * Class CompanyRelationships
+ * Class OrganisationRelationships
  * @package Pingen\Models
  */
 class OrganisationRelationships extends DataTransferObject
