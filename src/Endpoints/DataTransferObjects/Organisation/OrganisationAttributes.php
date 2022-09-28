@@ -15,7 +15,14 @@ class OrganisationAttributes extends DataTransferObject
 
     public ?string $plan;
 
+    public ?string $billing_mode;
+
     public ?string $billing_currency;
+
+    /**
+     * @var float|int|null
+     */
+    public $billing_balance;
 
     public ?string $default_country;
 
