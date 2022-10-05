@@ -17,7 +17,20 @@ class LetterAttributes extends DataTransferObject
 
     public string $file_original_name;
 
+    public ?int $file_pages;
+
     public string $address_position;
+
+    public ?string $address;
+
+    public ?string $country;
+
+    public ?string $price_currency;
+
+    /**
+     * @var float|int|null
+     */
+    public $price_value;
 
     public ?string $delivery_product;
 
