@@ -9,6 +9,8 @@ use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollectionItem;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterDetails;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterEditAttributes;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterPrice;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceCalculationAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterSendAttributes;
 use Pingen\Endpoints\ParameterBags\LetterCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\LetterParameterBag;
@@ -120,6 +122,22 @@ class LettersEndpoint extends ResourceEndpoint
                 sprintf('/organisations/%s/letters/', $this->getOrganisationId()),
                 'letters',
                 $letterCreateAttributes
+            )->json()
+        );
+    }
+
+    /**
+     * @param LetterPriceCalculationAttributes $letterPriceCalculationAttributes
+     * @return LetterPrice
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function calculatePrice(LetterPriceCalculationAttributes $letterPriceCalculationAttributes): LetterPrice
+    {
+        return new LetterPrice(
+            $this->performPostRequest(
+                sprintf('/organisations/%s/letters/price-calculator', $this->getOrganisationId()),
+                'letter_price_calculator',
+                $letterPriceCalculationAttributes
             )->json()
         );
     }
