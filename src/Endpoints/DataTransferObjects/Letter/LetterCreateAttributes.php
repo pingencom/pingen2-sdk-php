@@ -18,6 +18,7 @@ use Pingen\Support\Input;
  * @method LetterCreateAttributes setDeliveryProduct(string $value)
  * @method LetterCreateAttributes setPrintMode(string $value)
  * @method LetterCreateAttributes setPrintSpectrum(string $value)
+ * @method LetterCreateAttributes setMetaData(array $metaData)
  */
 class LetterCreateAttributes extends Input
 {
@@ -36,4 +37,6 @@ class LetterCreateAttributes extends Input
     protected string $print_mode;
 
     protected string $print_spectrum;
+
+    protected ?array $meta_data;
 }
