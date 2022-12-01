@@ -37,6 +37,8 @@ abstract class ResourceEndpoint
 
     protected bool $useStaging = false;
 
+    protected ?string $idempotencyKey = null;
+
     /**
      * Endpoint constructor.
      * @param AccessToken $accessToken
@@ -65,6 +67,13 @@ abstract class ResourceEndpoint
     public function useStaging(): self
     {
         $this->useStaging = true;
+
+        return $this;
+    }
+
+    public function setIdempotencyKey(string $key): self
+    {
+        $this->idempotencyKey = $key;
 
         return $this;
     }
@@ -241,9 +250,15 @@ abstract class ResourceEndpoint
      */
     protected function getAuthenticatedJsonApiRequest(): PendingRequest
     {
-        return $this->getAuthenticatedRequest()
+        $pendingRequest = $this->getAuthenticatedRequest()
             ->accept('application/vnd.api+json')
             ->contentType('application/vnd.api+json');
+
+        if ($this->idempotencyKey !== null) {
+            $pendingRequest = $pendingRequest->withHeaders(['Idempotency-Key' => $this->idempotencyKey]);
+        }
+
+        return $pendingRequest;
     }
 
     /**
