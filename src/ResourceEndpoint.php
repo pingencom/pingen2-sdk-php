@@ -255,7 +255,9 @@ abstract class ResourceEndpoint
             ->contentType('application/vnd.api+json');
 
         if ($this->idempotencyKey !== null) {
-            $pendingRequest = $pendingRequest->withHeaders(['Idempotency-Key' => $this->idempotencyKey]);
+            $pendingRequest = $pendingRequest->withHeaders([
+                'Idempotency-Key' => $this->idempotencyKey,
+            ]);
         }
 
         return $pendingRequest;
