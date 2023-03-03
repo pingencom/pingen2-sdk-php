@@ -13,6 +13,8 @@ use Pingen\Support\DataTransferObject;
  */
 class LetterEventAttributes extends DataTransferObject
 {
+    public string $name;
+
     public string $code;
 
     public string $producer;
