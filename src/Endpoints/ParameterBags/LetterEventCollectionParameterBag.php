@@ -41,7 +41,17 @@ class LetterEventCollectionParameterBag extends CollectionParameterBag
      */
     public function setLanguage(string $language): self
     {
-        $this->set('language', $language);
+        $availableLanguages = [
+            'en' => 'en-GB',
+            'de' => 'de-DE',
+            'fr' => 'fr-FR'
+        ];
+
+        if(strlen($language) == 2) {
+            $language = $availableLanguages[strtolower($language)] ?? 'en-GB';
+        }
+
+        $this->set('language', $language?: 'en-GB');
 
         return $this;
     }
