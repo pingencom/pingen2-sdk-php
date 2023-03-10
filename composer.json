@@ -29,7 +29,7 @@
     ],
     "require-dev": {
         "php-parallel-lint/php-parallel-lint": "^1.2",
-        "nikic/php-parser": "4.9.*",
+        "nikic/php-parser": "4.15.*",
         "phpunit/phpunit": "^9.3",
         "mockery/mockery": "^1.4",
         "symplify/easy-coding-standard-prefixed": "9.2.6",
