@@ -16,7 +16,7 @@ class FileUploadTest extends EndpointTest
 {
     public function testUploadUrlExpired(): void
     {
-       $endpoint = new FileUploadEndpoint(new AccessToken(['access_token' => 'example']));
+       $endpoint = new FileUploadEndpoint($this->getAccessToken());
 
         try {
             $endpoint->uploadFile(
