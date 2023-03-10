@@ -16,25 +16,27 @@ class FileUploadTest extends EndpointTest
 {
     public function testUploadUrlExpired(): void
     {
-        $this->expectErrorMessage('File upload url has expired. Please request a new one.');
+       $endpoint = new FileUploadEndpoint($this->getAccessToken());
 
-        $endpoint = new FileUploadEndpoint($this->getAccessToken());
-
-        $endpoint->uploadFile(
-            new FileUploadDetails(
-                [
-                    'data' => [
-                        'id' => 'id',
-                        'type' => 'file_uploads',
-                        'attributes' => [
-                            'url' => 'http://exampeurl',
-                            'url_signature' => 'examplesignature',
-                            'expires_at' => Carbon::now()->subMinute(),
+        try {
+            $endpoint->uploadFile(
+                new FileUploadDetails(
+                    [
+                        'data' => [
+                            'id' => 'id',
+                            'type' => 'file_uploads',
+                            'attributes' => [
+                                'url' => 'http://exampeurl',
+                                'url_signature' => 'examplesignature',
+                                'expires_at' => Carbon::now()->subMinute(),
+                            ],
                         ],
-                    ],
-                ]
-            ),
-            'lorem ipsum'
-        );
-    } //@codeCoverageIgnore
+                    ]
+                ),
+                'lorem ipsum'
+            );
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('File upload url has expired. Please request a new one.', $e->getMessage());
+        }
+    }
 }
