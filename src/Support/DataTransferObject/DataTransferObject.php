@@ -13,15 +13,18 @@ use ReflectionProperty;
  */
 abstract class DataTransferObject
 {
-    protected bool $ignoreMissing = true;
-    protected array $exceptKeys = [];
-    protected array $onlyKeys = [];
     /**
      * - The key is the type of the property
      * - The callable receives the value and may return the same or a different value
      * @var array<string,callable>
      */
     public static array $makers = [];
+
+    protected bool $ignoreMissing = true;
+
+    protected array $exceptKeys = [];
+
+    protected array $onlyKeys = [];
 
     /**
      * @param array<mixed> $parameters

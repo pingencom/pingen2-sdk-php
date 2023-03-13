@@ -14,6 +14,7 @@ abstract class DataTransferObjectCollection implements
     Countable
 {
     protected array $collection;
+
     protected int $position = 0;
 
     public function __construct(array $collection = [])

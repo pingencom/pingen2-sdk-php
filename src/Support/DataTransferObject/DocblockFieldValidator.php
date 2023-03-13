@@ -30,7 +30,7 @@ REGEXP;
     public function __construct(string $definition, bool $hasDefaultValue = false)
     {
         preg_match(
-            DocblockFieldValidator::DOCBLOCK_REGEX,
+            self::DOCBLOCK_REGEX,
             $definition,
             $matches
         );
@@ -70,7 +70,7 @@ REGEXP;
         $types = $this->normaliseTypes(...explode('|', $definition));
 
         foreach ($types as $type) {
-            if (in_array($type, ['iterable', 'array'])) {
+            if (in_array($type, ['iterable', 'array'], true)) {
                 return true;
             }
         }

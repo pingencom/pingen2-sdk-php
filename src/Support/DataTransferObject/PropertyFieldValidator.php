@@ -48,7 +48,7 @@ class PropertyFieldValidator extends FieldValidator
         $types = [$reflectionType];
 
         foreach ($types as $type) {
-            if (in_array($type->getName(), ['iterable', 'array'])) {
+            if (in_array($type->getName(), ['iterable', 'array'], true)) {
                 return true;
             }
         }

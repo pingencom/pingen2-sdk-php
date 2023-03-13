@@ -9,11 +9,17 @@ use ReflectionProperty;
 abstract class FieldValidator
 {
     public bool $isNullable;
+
     public bool $isMixed;
+
     public bool $isMixedArray;
+
     public bool $hasDefaultValue;
+
     public array $allowedTypes;
+
     public array $allowedArrayTypes;
+
     public array $allowedArrayKeyTypes;
 
     protected static array $typeMapping = [
@@ -47,7 +53,7 @@ abstract class FieldValidator
 
     public function isValidType(mixed $value): bool
     {
-        if (!$this->hasTypeDeclaration) {
+        if (! $this->hasTypeDeclaration) {
             return true;
         }
 
