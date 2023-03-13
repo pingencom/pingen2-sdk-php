@@ -12,7 +12,7 @@ use League\OAuth2\Client\Token\AccessToken;
 use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\RateLimitJsonApiException;
 use Pingen\Support\CollectionParameterBag;
-use Pingen\Support\DataTransferObject;
+use Pingen\Support\DataTransferObject\DataTransferObject;
 use Pingen\Support\Input;
 use Symfony\Component\HttpFoundation\ParameterBag;
 

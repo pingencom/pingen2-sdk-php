@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pingen\Endpoints\DataTransferObjects\UserAssociation;
 
 use Carbon\CarbonImmutable;
-use Pingen\Support\DataTransferObject;
+use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
  * Class UserAssociationItemAttributes
