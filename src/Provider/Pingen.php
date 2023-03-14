@@ -16,7 +16,7 @@ use Pingen\ResourceOwner;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class Provider
+ * Class Pingen
  * @package Pingen
  */
 class Pingen extends AbstractProvider

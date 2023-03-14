@@ -6,7 +6,7 @@ namespace Pingen\Endpoints\DataTransferObjects\Letter;
 
 use Pingen\Endpoints\DataTransferObjects\General\RelationshipRelatedItem;
 use Pingen\Endpoints\DataTransferObjects\General\RelationshipRelatedMany;
-use Pingen\Support\DataTransferObject;
+use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
  * Class LetterRelationships

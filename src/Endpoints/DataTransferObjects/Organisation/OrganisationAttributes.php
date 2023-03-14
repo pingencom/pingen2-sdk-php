@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pingen\Endpoints\DataTransferObjects\Organisation;
 
 use Carbon\CarbonImmutable;
-use Pingen\Support\DataTransferObject;
+use Pingen\Support\DataTransferObject\DataTransferObject;
 
 class OrganisationAttributes extends DataTransferObject
 {

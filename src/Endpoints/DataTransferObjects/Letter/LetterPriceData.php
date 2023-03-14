@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pingen\Endpoints\DataTransferObjects\Letter;
 
 use Pingen\Endpoints\DataTransferObjects\General\ItemLinks;
-use Pingen\Support\DataTransferObject;
+use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
  * Class LetterPriceData

@@ -6,7 +6,7 @@ namespace Pingen\Endpoints\DataTransferObjects\LetterEvent;
 
 use Pingen\Endpoints\DataTransferObjects\General\CollectionLinks;
 use Pingen\Endpoints\DataTransferObjects\General\CollectionMeta;
-use Pingen\Support\DataTransferObject;
+use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
  * Class LetterEventCollection

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Pingen\Endpoints\DataTransferObjects\FileUpload;
 
-use Pingen\Support\DataTransferObject;
+use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
  * Class FileUploadDetails

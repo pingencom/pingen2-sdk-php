@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pingen\Endpoints\DataTransferObjects\Letter;
 
 use Carbon\CarbonImmutable;
-use Pingen\Support\DataTransferObject;
+use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
  * Class LetterAttributes
