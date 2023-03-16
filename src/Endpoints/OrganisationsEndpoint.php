@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Pingen\Endpoints;
 
+use Illuminate\Http\Client\RequestException;
 use Pingen\Endpoints\DataTransferObjects\Organisation\OrganisationDetails;
 use Pingen\Endpoints\ParameterBags\OrganisationParameterBag;
 use Pingen\ResourceEndpoint;
 
 /**
- * Class CompaniesEndpoint
+ * Class OrganisationsEndpoint
  * @package Pingen\Endpoints
  */
 class OrganisationsEndpoint extends ResourceEndpoint
@@ -18,7 +19,7 @@ class OrganisationsEndpoint extends ResourceEndpoint
      * @param string $organisationId
      * @param OrganisationParameterBag|null $parameterBag
      * @return OrganisationDetails
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function getDetails(string $organisationId, ?OrganisationParameterBag $parameterBag = null): OrganisationDetails
     {

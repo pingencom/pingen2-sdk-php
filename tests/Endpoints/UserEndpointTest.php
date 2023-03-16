@@ -30,15 +30,16 @@ class UserEndpointTest extends EndpointTest
                             'updated_at' => '2023-03-01T12:12:00+0100'
                         ]),
                     ]
-                ]),
-                Response::HTTP_OK,
-            );
+                ]),Response::HTTP_OK);
 
         $endpoint->getDetails(new UserParameterBag());
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/user');
+                $this->assertEquals(
+                    sprintf('%s/user', $endpoint->getResourceBaseUrl()),
+                    $request->url()
+                );
             }
         );
 

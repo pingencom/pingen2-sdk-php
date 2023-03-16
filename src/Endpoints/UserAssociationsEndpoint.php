@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pingen\Endpoints;
 
+use Illuminate\Http\Client\RequestException;
 use Pingen\Endpoints\DataTransferObjects\UserAssociation\UserAssociationDetails;
 use Pingen\Endpoints\DataTransferObjects\UserAssociation\UserAssociationsCollection;
 use Pingen\Endpoints\DataTransferObjects\UserAssociation\UserAssociationsCollectionItem;
@@ -21,7 +22,7 @@ class UserAssociationsEndpoint extends ResourceEndpoint
     /**
      * @param UserAssociationCollectionParameterBag|null $listParameterBag
      * @return UserAssociationsCollection
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function getCollection(?UserAssociationCollectionParameterBag $listParameterBag = null): UserAssociationsCollection
     {
@@ -38,7 +39,7 @@ class UserAssociationsEndpoint extends ResourceEndpoint
     /**
      * @param UserAssociationCollectionParameterBag|null $listParameterBag
      * @return \Generator|UserAssociationsCollectionItem[]
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function iterateOverCollection(?UserAssociationCollectionParameterBag $listParameterBag = null)
     {
@@ -67,7 +68,7 @@ class UserAssociationsEndpoint extends ResourceEndpoint
      * @param string $associationId
      * @param UserAssociationParameterBag|null $parameterBag
      * @return UserAssociationDetails
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function getDetails(string $associationId, ?UserAssociationParameterBag $parameterBag = null): UserAssociationDetails
     {
