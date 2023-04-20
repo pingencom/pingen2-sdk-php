@@ -6,24 +6,22 @@ namespace Tests\Endpoints;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Response;
-use Pingen\Endpoints\LetterEventsEndpoint;
-use Pingen\Endpoints\ParameterBags\LetterEventCollectionParameterBag;
+use Pingen\Endpoints\LetterIssuesEndpoint;
+use Pingen\Endpoints\ParameterBags\LetterIssuesCollectionParameterBag;
 
 /**
- * Class LetterEventsEndpointTest
+ * Class LetterIssuesEndpointTest
  * @package Tests
  */
-class LetterEventsEndpointTest extends EndpointTest
+class LetterIssuesEndpointTest extends EndpointTest
 {
     public function testGetCollection(): void
     {
-        $listParameterBag = (new LetterEventCollectionParameterBag())
-            ->setPageLimit(10)
-            ->setPageNumber(2);
+        $listParameterBag = (new LetterIssuesCollectionParameterBag())
+            ->setPageLimit(10)->setPageNumber(2);
 
-        $endpoint = (new LetterEventsEndpoint($this->getAccessToken()))
-            ->setOrganisationId('example')
-            ->setLetterId('exampleLetterID');
+        $endpoint = (new LetterIssuesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
             ->push(
@@ -36,7 +34,7 @@ class LetterEventsEndpointTest extends EndpointTest
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    $endpoint->getResourceBaseUrl() . '/organisations/example/letters/exampleLetterID/events?page%5Blimit%5D=10&page%5Bnumber%5D=2',
+                    $endpoint->getResourceBaseUrl() . '/organisations/example/letters/issues?page%5Blimit%5D=10&page%5Bnumber%5D=2',
                     $request->url()
                 );
             }

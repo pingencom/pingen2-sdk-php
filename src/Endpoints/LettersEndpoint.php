@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pingen\Endpoints;
 
+use Illuminate\Http\Client\RequestException;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollection;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollectionItem;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
@@ -30,7 +31,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @param string $letterId
      * @param LetterParameterBag|null $parameterBag
      * @return LetterDetails
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function getDetails(string $letterId, ?LetterParameterBag $parameterBag = null): LetterDetails
     {
@@ -46,7 +47,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @param LetterCollectionParameterBag|null $letterCollectionParameterBag
      * @return LetterCollection
      * @throws RateLimitJsonApiException
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function getCollection(?LetterCollectionParameterBag $letterCollectionParameterBag = null): LetterCollection
     {
@@ -62,7 +63,7 @@ class LettersEndpoint extends ResourceEndpoint
     /**
      * @param LetterCollectionParameterBag|null $listParameterBag
      * @return \Generator|LetterCollectionItem[]
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function iterateOverCollection(?LetterCollectionParameterBag $listParameterBag = null)
     {
@@ -91,7 +92,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @param LetterCreateAttributes $letterCreateAttributes
      * @param resource|string $file File content as string, or resource
      * @return LetterDetails
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function uploadAndCreate(LetterCreateAttributes $letterCreateAttributes, $file): LetterDetails
     {
@@ -113,7 +114,7 @@ class LettersEndpoint extends ResourceEndpoint
     /**
      * @param LetterCreateAttributes $letterCreateAttributes
      * @return LetterDetails
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function create(LetterCreateAttributes $letterCreateAttributes): LetterDetails
     {
@@ -129,7 +130,7 @@ class LettersEndpoint extends ResourceEndpoint
     /**
      * @param LetterPriceCalculationAttributes $letterPriceCalculationAttributes
      * @return LetterPrice
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function calculatePrice(LetterPriceCalculationAttributes $letterPriceCalculationAttributes): LetterPrice
     {
@@ -147,7 +148,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @param LetterSendAttributes $letterSendAttributes
      * @return LetterDetails
      * @throws RateLimitJsonApiException
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function send(string $letterId, LetterSendAttributes $letterSendAttributes): LetterDetails
     {
@@ -166,7 +167,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @param LetterEditAttributes $letterEditAttributes
      * @return LetterDetails
      * @throws RateLimitJsonApiException
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function edit(string $letterId, LetterEditAttributes $letterEditAttributes): LetterDetails
     {
@@ -184,7 +185,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @param string $letterId
      * @return void
      * @throws RateLimitJsonApiException
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function cancel(string $letterId): void
     {
@@ -199,7 +200,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @param string $letterId
      * @return void
      * @throws RateLimitJsonApiException
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function delete(string $letterId): void
     {
@@ -212,7 +213,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @param string $letterId
      * @return resource
      * @throws RateLimitJsonApiException
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
     public function getFile(string $letterId)
     {

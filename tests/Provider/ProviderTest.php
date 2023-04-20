@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Provider;
 
+use GuzzleHttp\Psr7\Stream;
 use League\OAuth2\Client\Token\AccessToken;
 use Mockery as m;
 use Pingen\Provider\Pingen;
 use Tests\TestCase;
 
-/**
- * Class ProviderTest
- * @package Tests
- */
 class ProviderTest extends TestCase
 {
     protected Pingen $provider;
@@ -64,8 +61,10 @@ class ProviderTest extends TestCase
 
     public function testClientCredentialsAccessTokenIssued(): void
     {
+        $stream = fopen('data://text/plain,{"token_type": "Bearer", "access_token": "mock_access_token", "expires_in": 3600}','r');
+
         $response = m::mock('Psr\Http\Message\ResponseInterface');
-        $response->shouldReceive('getBody')->andReturn('{"token_type": "Bearer", "access_token": "mock_access_token", "expires_in": 3600}');
+        $response->shouldReceive('getBody')->andReturn(new Stream($stream));
         $response->shouldReceive('getHeader')->andReturn([
             'content-type' => 'json',
         ]);
@@ -92,8 +91,9 @@ class ProviderTest extends TestCase
 
     public function testGetResourceOwner(): void
     {
+        $stream = fopen('data://text/plain,{"data": {"id": "uuidv4", "attributes": {"email": "foo@bar", "first_name": "Foo", "last_name": "Bar"}}}','r');
         $userResponse = m::mock('Psr\Http\Message\ResponseInterface');
-        $userResponse->shouldReceive('getBody')->andReturn('{"data": {"id": "uuidv4", "attributes": {"email": "foo@bar", "first_name": "Foo", "last_name": "Bar"}}}');
+        $userResponse->shouldReceive('getBody')->andReturn(new Stream($stream));
         $userResponse->shouldReceive('getHeader')->andReturn([
             'content-type' => 'json',
         ]);
