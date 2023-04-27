@@ -14,7 +14,8 @@ use Pingen\Support\HasOrganisationContext;
 
 class BatchEventsEndpoint extends ResourceEndpoint
 {
-    use HasOrganisationContext, HasBatchContext;
+    use HasOrganisationContext;
+    use HasBatchContext;
 
     /**
      * @param BatchEventCollectionParameterBag|null $batchEventCollectionParameterBag
