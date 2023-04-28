@@ -21,7 +21,7 @@ class BatchCollection extends DataTransferObject
     public CollectionMeta $meta;
 
     /**
-     * @var OrganisationIncluded[]
+     * @var OrganisationIncluded[]|null
      */
     public ?array $included;
 }
