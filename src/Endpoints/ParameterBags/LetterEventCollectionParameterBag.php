@@ -33,4 +33,16 @@ class LetterEventCollectionParameterBag extends CollectionParameterBag
 
         return $this;
     }
+
+    /**
+     *
+     * @param string $language
+     * @return LetterEventCollectionParameterBag
+     */
+    public function setLanguage(string $language): self
+    {
+        $this->set('language', $language);
+
+        return $this;
+    }
 }
