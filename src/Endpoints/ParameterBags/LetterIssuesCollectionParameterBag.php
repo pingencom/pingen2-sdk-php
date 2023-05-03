@@ -33,4 +33,16 @@ class LetterIssuesCollectionParameterBag extends CollectionParameterBag
 
         return $this;
     }
+
+    /**
+     *
+     * @param string $language
+     * @return LetterIssuesCollectionParameterBag
+     */
+    public function setLanguage(string $language): self
+    {
+        $this->set('language', $language);
+
+        return $this;
+    }
 }

@@ -29,4 +29,16 @@ class BatchEventCollectionParameterBag extends CollectionParameterBag
 
         return $this;
     }
+
+    /**
+     *
+     * @param string $language
+     * @return BatchEventCollectionParameterBag
+     */
+    public function setLanguage(string $language): self
+    {
+        $this->set('language', $language);
+
+        return $this;
+    }
 }
