@@ -18,7 +18,7 @@ trait HasBatchContext
     public function getBatchId(): string
     {
         if (! $this->batchId) {
-            throw new \RuntimeException('Letter id has to be set first.'); //@codeCoverageIgnore
+            throw new \RuntimeException('Batch id has to be set first.'); //@codeCoverageIgnore
         }
 
         return $this->batchId;

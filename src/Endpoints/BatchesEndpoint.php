@@ -18,7 +18,7 @@ use Pingen\Exceptions\RateLimitJsonApiException;
 use Pingen\ResourceEndpoint;
 use Pingen\Support\HasOrganisationContext;
 
-class BatchEndpoint extends ResourceEndpoint
+class BatchesEndpoint extends ResourceEndpoint
 {
     use HasOrganisationContext;
 

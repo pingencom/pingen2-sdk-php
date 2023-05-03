@@ -8,7 +8,7 @@ use Pingen\Support\CollectionParameterBag;
 
 class BatchCollectionParameterBag extends CollectionParameterBag
 {
-    public function setFieldsLetter(array $fields): self
+    public function setFieldsBatch(array $fields): self
     {
         $this->set('fields[batches]', collect($fields)->join(','));
 

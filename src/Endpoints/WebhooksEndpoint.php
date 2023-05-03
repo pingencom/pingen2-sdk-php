@@ -15,7 +15,7 @@ use Pingen\Exceptions\RateLimitJsonApiException;
 use Pingen\ResourceEndpoint;
 use Pingen\Support\HasOrganisationContext;
 
-class WebhookEndpoint extends ResourceEndpoint
+class WebhooksEndpoint extends ResourceEndpoint
 {
     use HasOrganisationContext;
 

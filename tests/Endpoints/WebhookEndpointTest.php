@@ -11,7 +11,7 @@ use Pingen\Endpoints\DataTransferObjects\Webhook\WebhookCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Webhook\WebhookDetailsData;
 use Pingen\Endpoints\ParameterBags\WebhookCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\WebhookParameterBag;
-use Pingen\Endpoints\WebhookEndpoint;
+use Pingen\Endpoints\WebhooksEndpoint;
 
 class WebhookEndpointTest extends EndpointTest
 {
@@ -21,7 +21,7 @@ class WebhookEndpointTest extends EndpointTest
             ->setPageLimit(10)
             ->setPageNumber(2);
 
-        $endpoint = (new WebhookEndpoint($this->getAccessToken()))
+        $endpoint = (new WebhooksEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -46,7 +46,7 @@ class WebhookEndpointTest extends EndpointTest
         $webhookId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new WebhookEndpoint($this->getAccessToken()))
+        $endpoint = (new WebhooksEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -83,7 +83,7 @@ class WebhookEndpointTest extends EndpointTest
             ->setPageLimit(10)
             ->setPageNumber(2);
 
-        $endpoint = (new WebhookEndpoint($this->getAccessToken()))
+        $endpoint = (new WebhooksEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -108,7 +108,7 @@ class WebhookEndpointTest extends EndpointTest
         $webhookId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new WebhookEndpoint($this->getAccessToken()))
+        $endpoint = (new WebhooksEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -148,7 +148,7 @@ class WebhookEndpointTest extends EndpointTest
         $webhookId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new WebhookEndpoint($this->getAccessToken()))
+        $endpoint = (new WebhooksEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()

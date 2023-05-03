@@ -6,7 +6,7 @@ namespace Tests\Endpoints;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Response;
-use Pingen\Endpoints\BatchEndpoint;
+use Pingen\Endpoints\BatchesEndpoint;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchDetailsData;
@@ -23,7 +23,7 @@ class BatchEndpointTest extends EndpointTest
             ->setPageLimit(10)
             ->setPageNumber(2);
 
-        $endpoint = (new BatchEndpoint($this->getAccessToken()))
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -48,7 +48,7 @@ class BatchEndpointTest extends EndpointTest
         $batchId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new BatchEndpoint($this->getAccessToken()))
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -95,7 +95,7 @@ class BatchEndpointTest extends EndpointTest
             ->setPageLimit(10)
             ->setPageNumber(2);
 
-        $endpoint = (new BatchEndpoint($this->getAccessToken()))
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -120,7 +120,7 @@ class BatchEndpointTest extends EndpointTest
         $batchId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new BatchEndpoint($this->getAccessToken()))
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -174,7 +174,7 @@ class BatchEndpointTest extends EndpointTest
         $batchId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new BatchEndpoint($this->getAccessToken()))
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -224,7 +224,7 @@ class BatchEndpointTest extends EndpointTest
         $batchId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new BatchEndpoint($this->getAccessToken()))
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -270,7 +270,7 @@ class BatchEndpointTest extends EndpointTest
         $batchId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new BatchEndpoint($this->getAccessToken()))
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -295,7 +295,7 @@ class BatchEndpointTest extends EndpointTest
         $batchId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new BatchEndpoint($this->getAccessToken()))
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()

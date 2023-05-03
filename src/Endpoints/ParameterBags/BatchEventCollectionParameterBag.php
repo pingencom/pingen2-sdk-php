@@ -12,7 +12,7 @@ class BatchEventCollectionParameterBag extends CollectionParameterBag
      * @param array $fields
      * @return BatchEventCollectionParameterBag
      */
-    public function setFieldsLetter(array $fields): self
+    public function setFieldsBatch(array $fields): self
     {
         $this->set('fields[batches]', collect($fields)->join(','));
 
@@ -23,7 +23,7 @@ class BatchEventCollectionParameterBag extends CollectionParameterBag
      * @param array $fields
      * @return BatchEventCollectionParameterBag
      */
-    public function setFieldsLetterEvent(array $fields): self
+    public function setFieldsBatchEvent(array $fields): self
     {
         $this->set('fields[batches_events]', collect($fields)->join(','));
 
