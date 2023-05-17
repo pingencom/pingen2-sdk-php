@@ -247,7 +247,7 @@ abstract class ResourceEndpoint
 
     /**
      * @param string $url
-     * @param $tmpFile
+     * @param resource $tmpFile
      * @return void
      * @throws \Illuminate\Http\Client\RequestException
      */
