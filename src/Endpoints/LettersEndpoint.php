@@ -224,7 +224,7 @@ class LettersEndpoint extends ResourceEndpoint
         $tmpFile = tmpfile();
 
         if (! is_resource($tmpFile)) {
-            throw new \RuntimeException('Cannot create tmp file.');
+            throw new \RuntimeException('Cannot create tmp file.'); // @codeCoverageIgnore
         }
 
         fwrite($tmpFile, $response->body());

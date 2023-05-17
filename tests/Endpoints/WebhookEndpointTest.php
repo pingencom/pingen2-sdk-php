@@ -19,10 +19,12 @@ class WebhookEndpointTest extends EndpointTest
     {
         $listParameterBag = (new WebhookCollectionParameterBag())
             ->setPageLimit(10)
-            ->setPageNumber(2);
+            ->setPageNumber(2)
+            ->setFields(['name']);
 
         $endpoint = (new WebhooksEndpoint($this->getAccessToken()))
-            ->setOrganisationId('example');
+            ->setOrganisationId('example')
+            ->setIdempotencyKey('test');
 
         $endpoint->getHttpClient()->fakeSequence()
             ->push(
@@ -34,7 +36,7 @@ class WebhookEndpointTest extends EndpointTest
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bwebhooks%5D=name');
             }
         );
 

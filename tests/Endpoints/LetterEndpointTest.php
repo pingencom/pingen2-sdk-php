@@ -364,4 +364,27 @@ class LetterEndpointTest extends EndpointTest
 
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
+
+    public function testGetFile(): void
+    {
+        $letterId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push('',Response::HTTP_FOUND);
+
+        $endpoint->getFile($letterId);
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $letterId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    $request->url()
+                );
+            }
+        );
+    }
 }
