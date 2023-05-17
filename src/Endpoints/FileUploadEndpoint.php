@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Pingen\Endpoints;
 
-use Illuminate\Http\Client\Factory as HttpClient;
 use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetails;
 use Pingen\Endpoints\ParameterBags\FileUploadParameterBag;
 use Pingen\ResourceEndpoint;
@@ -48,7 +47,7 @@ class FileUploadEndpoint extends ResourceEndpoint
 
         $tmpFile = tmpfile();
         if (! is_resource($tmpFile)) {
-            throw new \RuntimeException('Cannot create tmp file.');
+            throw new \RuntimeException('Cannot create tmp file.'); // @codeCoverageIgnore
         }
 
         switch (true) {
@@ -70,15 +69,6 @@ class FileUploadEndpoint extends ResourceEndpoint
                 throw new \InvalidArgumentException('Invalid file parameter.');
         }
 
-        (new HttpClient())
-            ->bodyFormat('none')
-            ->withOptions([
-                'body' => $tmpFile,
-                'headers' => [
-                    'Content-Type' => 'application/pdf',
-                ],
-            ])
-            ->put($fileUploadDetails->data->attributes->url)
-            ->throw();
+        $this->performPutFileRequest($fileUploadDetails->data->attributes->url, $tmpFile);
     }
 }

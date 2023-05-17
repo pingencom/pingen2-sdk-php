@@ -92,15 +92,17 @@ class WebhookEndpointTest extends EndpointTest
                 Response::HTTP_OK,
             );
 
-        $endpoint->iterateOverCollection($listParameterBag);
+        foreach ($endpoint->iterateOverCollection($listParameterBag) as $webhookCollectionItem) {
+            //
+        }
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks/?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks?page%5Blimit%5D=10&page%5Bnumber%5D=2');
             }
         );
 
-        $this->assertCount(0, $endpoint->getHttpClient()->recorded());
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
 
     public function testCreate(): void

@@ -246,6 +246,26 @@ abstract class ResourceEndpoint
     }
 
     /**
+     * @param string $url
+     * @param $tmpFile
+     * @return void
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    protected function performPutFileRequest(string $url, $tmpFile): void
+    {
+        $this->getHttpClient()
+            ->bodyFormat('none')
+            ->withOptions([
+                'body' => $tmpFile,
+                'headers' => [
+                    'Content-Type' => 'application/pdf',
+                ],
+            ])
+            ->put($url)
+            ->throw();
+    }
+
+    /**
      * @return PendingRequest
      */
     protected function getAuthenticatedJsonApiRequest(): PendingRequest

@@ -18,10 +18,6 @@ use Pingen\Endpoints\LettersEndpoint;
 use Pingen\Endpoints\ParameterBags\LetterCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\LetterParameterBag;
 
-/**
- * Class LetterEndpointTest
- * @package Tests
- */
 class LetterEndpointTest extends EndpointTest
 {
     public function testGetLetterCollection(): void
@@ -118,7 +114,9 @@ class LetterEndpointTest extends EndpointTest
                 Response::HTTP_OK,
             );
 
-        $endpoint->iterateOverCollection($listParameterBag);
+        foreach ($endpoint->iterateOverCollection($listParameterBag) as $letterCollectionItem) {
+            //
+        }
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
@@ -126,7 +124,7 @@ class LetterEndpointTest extends EndpointTest
             }
         );
 
-        $this->assertCount(0, $endpoint->getHttpClient()->recorded());
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
 
     public function testCreate(): void

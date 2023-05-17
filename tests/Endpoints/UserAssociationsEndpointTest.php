@@ -107,7 +107,9 @@ class UserAssociationsEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->iterateOverCollection(new UserAssociationCollectionParameterBag());
+        foreach ($endpoint->iterateOverCollection(new UserAssociationCollectionParameterBag()) as $userCollectionItem) {
+            //
+        }
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
@@ -118,7 +120,7 @@ class UserAssociationsEndpointTest extends EndpointTest
             }
         );
 
-        $this->assertCount(0, $endpoint->getHttpClient()->recorded());
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
 
     public function testGetDetails(): void
