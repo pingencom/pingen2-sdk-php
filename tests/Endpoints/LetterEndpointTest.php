@@ -113,7 +113,11 @@ class LetterEndpointTest extends EndpointTest
     {
         $listParameterBag = (new LetterCollectionParameterBag())
             ->setPageLimit(10)
-            ->setPageNumber(2);
+            ->setPageNumber(2)
+            ->setSort('created_at')
+            ->setFilter(['name' => 'testName'])
+            ->setQ('test')
+            ->setInclude(['organisations']);
 
         $endpoint = (new LettersEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
@@ -130,7 +134,7 @@ class LetterEndpointTest extends EndpointTest
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2&sort=created_at&filter=%7B%22name%22%3A%22testName%22%7D&q=test&include=organisations');
             }
         );
 
@@ -520,6 +524,7 @@ class LetterEndpointTest extends EndpointTest
             $endpoint->getFile($letterId);
         } catch (JsonApiException $e) {
             $this->assertEquals(Response::HTTP_FORBIDDEN, $e->getCode());
+            $this->assertEquals(1, count($e->getBody()->errors));
         }
 
         $endpoint->getHttpClient()->recorded(
