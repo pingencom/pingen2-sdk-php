@@ -57,12 +57,12 @@ class UserAssociationsEndpointTest extends EndpointTest
                 Response::HTTP_OK,
             );
 
-        $endpoint->getCollection(new UserAssociationCollectionParameterBag());
+        $endpoint->getCollection((new UserAssociationCollectionParameterBag())->setFieldsAssociation(['role'])->setFieldsOrganisations(['name']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    sprintf( '%s/user/associations', $endpoint->getResourceBaseUrl()),
+                    sprintf( '%s/user/associations', $endpoint->getResourceBaseUrl()) . '?fields%5Bassociations%5D=role&fields%5Borganisations%5D=name',
                     $request->url()
                 );
             }
@@ -154,12 +154,12 @@ class UserAssociationsEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->getDetails($associationId, new UserAssociationParameterBag());
+        $endpoint->getDetails($associationId, (new UserAssociationParameterBag())->setFields(['role']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $associationId): void {
                 $this->assertEquals(
-                    sprintf( '%s/user/associations/%s', $endpoint->getResourceBaseUrl(), $associationId),
+                    sprintf( '%s/user/associations/%s', $endpoint->getResourceBaseUrl(), $associationId) . '?fields%5Busers%5D=role',
                     $request->url()
                 );
             }

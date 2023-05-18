@@ -65,12 +65,12 @@ class WebhookEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->getDetails($webhookId, new WebhookParameterBag());
+        $endpoint->getDetails($webhookId, (new WebhookParameterBag())->setFields(['attempts']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $webhookId, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/webhooks/%s', $endpoint->getResourceBaseUrl(), $organisationId, $webhookId),
+                    sprintf('%s/organisations/%s/webhooks/%s', $endpoint->getResourceBaseUrl(), $organisationId, $webhookId) . '?fields%5Bwebhooks%5D=attempts',
                     $request->url()
                 );
             }

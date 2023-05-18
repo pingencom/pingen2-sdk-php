@@ -32,12 +32,12 @@ class UserEndpointTest extends EndpointTest
                     ]
                 ]),Response::HTTP_OK);
 
-        $endpoint->getDetails(new UserParameterBag());
+        $endpoint->getDetails((new UserParameterBag())->setFields(['first_name']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    sprintf('%s/user', $endpoint->getResourceBaseUrl()),
+                    sprintf('%s/user', $endpoint->getResourceBaseUrl()) . '?fields%5Busers%5D=first_name',
                     $request->url()
                 );
             }

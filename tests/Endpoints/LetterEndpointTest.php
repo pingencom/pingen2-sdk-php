@@ -22,6 +22,10 @@ use Pingen\Endpoints\FileUploadEndpoint;
 use Pingen\Endpoints\LettersEndpoint;
 use Pingen\Endpoints\ParameterBags\LetterCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\LetterParameterBag;
+use Pingen\Exceptions\JsonApiException;
+use Pingen\Exceptions\JsonApiExceptionError;
+use Pingen\Exceptions\JsonApiExceptionErrorSource;
+use Pingen\Exceptions\RateLimitJsonApiException;
 
 class LetterEndpointTest extends EndpointTest
 {
@@ -29,7 +33,8 @@ class LetterEndpointTest extends EndpointTest
     {
         $listParameterBag = (new LetterCollectionParameterBag())
             ->setPageLimit(10)
-            ->setPageNumber(2);
+            ->setPageNumber(2)
+            ->setFieldsLetter(['status']);
 
         $endpoint = (new LettersEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
@@ -44,7 +49,7 @@ class LetterEndpointTest extends EndpointTest
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status');
             }
         );
 
@@ -90,12 +95,12 @@ class LetterEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->getDetails($letterId, new LetterParameterBag());
+        $endpoint->getDetails($letterId, (new LetterParameterBag())->setFields(['status']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $letterId, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId) . '?fields%5Bletters%5D=status',
                     $request->url()
                 );
             }
@@ -450,6 +455,72 @@ class LetterEndpointTest extends EndpointTest
             ->push('',Response::HTTP_FOUND);
 
         $endpoint->getFile($letterId);
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $letterId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    $request->url()
+                );
+            }
+        );
+    }
+
+    public function testRateLimit(): void
+    {
+        $letterId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_TOO_MANY_REQUESTS,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_TOO_MANY_REQUESTS);
+
+        try {
+            $endpoint->getFile($letterId);
+        } catch (RateLimitJsonApiException $e) {
+            $this->assertEquals(Response::HTTP_TOO_MANY_REQUESTS, $e->getCode());
+        }
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $letterId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    $request->url()
+                );
+            }
+        );
+    }
+
+    public function testApiException(): void
+    {
+        $letterId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_FORBIDDEN,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_FORBIDDEN);
+
+        try {
+            $endpoint->getFile($letterId);
+        } catch (JsonApiException $e) {
+            $this->assertEquals(Response::HTTP_FORBIDDEN, $e->getCode());
+        }
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $letterId): void {

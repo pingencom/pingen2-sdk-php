@@ -26,7 +26,8 @@ class BatchEndpointTest extends EndpointTest
     {
         $listParameterBag = (new BatchCollectionParameterBag())
             ->setPageLimit(10)
-            ->setPageNumber(2);
+            ->setPageNumber(2)
+            ->setFieldsBatch(['name']);
 
         $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
@@ -41,7 +42,7 @@ class BatchEndpointTest extends EndpointTest
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/batches/?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/batches/?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bbatches%5D=name');
             }
         );
 
@@ -80,12 +81,12 @@ class BatchEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->getDetails($batchId, new BatchParameterBag());
+        $endpoint->getDetails($batchId, (new BatchParameterBag())->setFields(['name']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $batchId, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/batches/%s', $endpoint->getResourceBaseUrl(), $organisationId, $batchId),
+                    sprintf('%s/organisations/%s/batches/%s', $endpoint->getResourceBaseUrl(), $organisationId, $batchId) . '?fields%5Bbatches%5D=name',
                     $request->url()
                 );
             }

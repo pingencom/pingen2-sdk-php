@@ -34,12 +34,12 @@ class FileUploadTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->requestFileUpload(new FileUploadParameterBag());
+        $endpoint->requestFileUpload((new FileUploadParameterBag())->setFields(['url_signature']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    sprintf('%s/file-upload', $endpoint->getResourceBaseUrl()),
+                    sprintf('%s/file-upload', $endpoint->getResourceBaseUrl()) . '?fields%5Bfile_uploads%5D=url_signature',
                     $request->url()
                 );
             }
