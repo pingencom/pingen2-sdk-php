@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Endpoints;
 
+use Carbon\Carbon;
+use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Response;
+use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadAttributes;
+use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetailsData;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterDetailsData;
@@ -14,6 +18,7 @@ use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceCalculationAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceData;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterSendAttributes;
+use Pingen\Endpoints\FileUploadEndpoint;
 use Pingen\Endpoints\LettersEndpoint;
 use Pingen\Endpoints\ParameterBags\LetterCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\LetterParameterBag;
@@ -162,6 +167,74 @@ class LetterEndpointTest extends EndpointTest
             ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
             ->setAddressPosition('left')
             ->setAutoSend(false));
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/', $endpoint->getResourceBaseUrl(), $organisationId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCreateAndUpload(): void
+    {
+        $letterId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $fileUploadEndpoint = new FileUploadEndpoint($this->getAccessToken());
+        $fileUploadEndpoint->getHttpClient()->fakeSequence()->push(
+            json_encode([
+                'data' => new FileUploadDetailsData([
+                    'id' => 'someTestId',
+                    'type' => 'file_uploads',
+                    'attributes' => new FileUploadAttributes([
+                        'url' => 'https://s3.example/bucket/filename?signer=url',
+                        'url_signature' => '$2y$10$BLOzVbYTXrh4LZbSYNVf7eEDrc58vvQ9PRVZABqV/9WS1eqIcm3M',
+                        'expires_at' => Carbon::now()->addDay()
+                    ])
+                ])
+            ]),Response::HTTP_OK)
+            ->push('', Response::HTTP_OK);
+
+        $endpoint = $this->createPartialMock(LettersEndpoint::class, ['getFileUploadEndpoint']);
+        $endpoint->method('getFileUploadEndpoint')->willReturn($fileUploadEndpoint);
+        $endpoint->setAccessToken($this->getAccessToken())
+             ->setHttpClient(new HttpClient());
+        $endpoint->setOrganisationId($organisationId)
+            ->useStaging();
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(
+                json_encode([
+                    'data' => new LetterDetailsData([
+                        'id' => $letterId,
+                        'type' => 'letters',
+                        'attributes' => new LetterAttributes([
+                            'status' => 'validating',
+                            'file_original_name' => 'lorem.pdf',
+                            'file_pages' => 2,
+                            'address' => 'Hans Meier\nExample street 4\n8000 Zürich\nSwitzerland',
+                            'address_position' => 'left',
+                            'country' => 'CH',
+                            'paper_types' => [],
+                            'fonts' => [],
+                            'created_at' => '2020-11-19T09:42:48+0100',
+                            'updated_at' => '2020-11-19T09:42:48+0100'
+                        ])
+                    ])
+                ]),Response::HTTP_CREATED);
+
+        /** @var resource $file */
+        $file = tmpfile();
+
+        $endpoint->uploadAndCreate((new LetterCreateAttributes())
+            ->setFileOriginalName('lorem.pdf')
+            ->setAddressPosition('left')
+            ->setAutoSend(false), $file);
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {

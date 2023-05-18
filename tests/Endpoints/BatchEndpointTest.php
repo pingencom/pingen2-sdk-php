@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Endpoints;
 
+use Carbon\Carbon;
+use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Response;
 use Pingen\Endpoints\BatchesEndpoint;
@@ -12,6 +14,9 @@ use Pingen\Endpoints\DataTransferObjects\Batch\BatchCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchDetailsData;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchEditAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchSendAttributes;
+use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadAttributes;
+use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetailsData;
+use Pingen\Endpoints\FileUploadEndpoint;
 use Pingen\Endpoints\ParameterBags\BatchCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\BatchParameterBag;
 
@@ -158,6 +163,77 @@ class BatchEndpointTest extends EndpointTest
             ->setAddressPosition('left')
             ->setGroupingType('zip')
         );
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/batches/', $endpoint->getResourceBaseUrl(), $organisationId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCreateAndUpload(): void
+    {
+        $batchId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $fileUploadEndpoint = new FileUploadEndpoint($this->getAccessToken());
+        $fileUploadEndpoint->getHttpClient()->fakeSequence()->push(
+            json_encode([
+                'data' => new FileUploadDetailsData([
+                    'id' => 'someTestId',
+                    'type' => 'file_uploads',
+                    'attributes' => new FileUploadAttributes([
+                        'url' => 'https://s3.example/bucket/filename?signer=url',
+                        'url_signature' => '$2y$10$BLOzVbYTXrh4LZbSYNVf7eEDrc58vvQ9PRVZABqV/9WS1eqIcm3M',
+                        'expires_at' => Carbon::now()->addDay()
+                    ])
+                ])
+            ]),Response::HTTP_OK)
+            ->push('', Response::HTTP_OK);
+
+        $endpoint = $this->createPartialMock(BatchesEndpoint::class, ['getFileUploadEndpoint']);
+        $endpoint->method('getFileUploadEndpoint')->willReturn($fileUploadEndpoint);
+        $endpoint->setAccessToken($this->getAccessToken())
+            ->setHttpClient(new HttpClient());
+        $endpoint->setOrganisationId($organisationId)
+            ->useStaging();
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(
+                json_encode([
+                    'data' => new BatchDetailsData([
+                        'id' => $batchId,
+                        'type' => 'batches',
+                        'attributes' => new BatchAttributes([
+                            'name' => 'example',
+                            'icon' => 'campaign',
+                            'status' => 'sent',
+                            'file_original_name' => 'uploaded.zip',
+                            'letter_count' => 21,
+                            'address_position' => 'left',
+                            'price_currency' => 'CHF',
+                            'price_value' => 1.25,
+                            'delivery_product' => 'fast',
+                            'print_mode' => 'simplex',
+                            'print_spectrum' => 'color',
+                            'created_at' => '2020-11-19T09:42:48+0100',
+                            'updated_at' => '2020-11-19T09:42:48+0100'
+                        ])
+                    ])
+                ]),Response::HTTP_CREATED);
+
+        /** @var resource $file */
+        $file = tmpfile();
+
+        $endpoint->uploadAndCreate((new BatchCreateAttributes())
+            ->setFileOriginalName('lorem.pdf')
+            ->setAddressPosition('left')
+            ->setAutoSend(false), $file);
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {

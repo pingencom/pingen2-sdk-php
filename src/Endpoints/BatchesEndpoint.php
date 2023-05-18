@@ -91,7 +91,7 @@ class BatchesEndpoint extends ResourceEndpoint
      */
     public function uploadAndCreate(BatchCreateAttributes $batchCreateAttributes, $file): BatchDetails
     {
-        $fileUploadEndpoint = new FileUploadEndpoint($this->getAccessToken());
+        $fileUploadEndpoint = $this->getFileUploadEndpoint();
         if ($this->isUsingStaging()) {
             $fileUploadEndpoint->useStaging();
         }
@@ -184,5 +184,10 @@ class BatchesEndpoint extends ResourceEndpoint
         $this->performDeleteRequest(
             sprintf('/organisations/%s/batches/%s', $this->getOrganisationId(), $batchId)
         );
+    }
+
+    protected function getFileUploadEndpoint(): FileUploadEndpoint
+    {
+        return new FileUploadEndpoint($this->getAccessToken());
     }
 }

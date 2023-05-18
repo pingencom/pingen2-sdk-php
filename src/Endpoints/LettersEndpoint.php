@@ -96,7 +96,7 @@ class LettersEndpoint extends ResourceEndpoint
      */
     public function uploadAndCreate(LetterCreateAttributes $letterCreateAttributes, $file): LetterDetails
     {
-        $fileUploadEndpoint = new FileUploadEndpoint($this->getAccessToken());
+        $fileUploadEndpoint = $this->getFileUploadEndpoint();
         if ($this->isUsingStaging()) {
             $fileUploadEndpoint->useStaging();
         }
@@ -231,5 +231,10 @@ class LettersEndpoint extends ResourceEndpoint
         rewind($tmpFile);
 
         return $tmpFile;
+    }
+
+    protected function getFileUploadEndpoint(): FileUploadEndpoint
+    {
+        return new FileUploadEndpoint($this->getAccessToken());
     }
 }
