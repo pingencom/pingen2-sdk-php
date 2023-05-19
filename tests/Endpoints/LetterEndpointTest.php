@@ -141,6 +141,33 @@ class LetterEndpointTest extends EndpointTest
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
 
+    public function testIterateOverCollectionRateLimit(): void
+    {
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId('example');
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_TOO_MANY_REQUESTS,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_TOO_MANY_REQUESTS);
+
+        foreach ($endpoint->iterateOverCollection() as $letterCollectionItem) {
+            //
+        }
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint): void {
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/');
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
     public function testCreate(): void
     {
         $letterId = 'exampleId';
@@ -255,6 +282,26 @@ class LetterEndpointTest extends EndpointTest
         );
 
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCreateAndUploadUnauthorized(): void
+    {
+        $organisationId = 'orgId';
+
+        $endpoint = new LettersEndpoint($this->getAccessToken());
+        $endpoint->setOrganisationId($organisationId);
+
+        /** @var resource $file */
+        $file = tmpfile();
+
+        try {
+            $endpoint->uploadAndCreate((new LetterCreateAttributes())
+                ->setFileOriginalName('lorem.pdf')
+                ->setAddressPosition('left')
+                ->setAutoSend(false), $file);
+        } catch (JsonApiException $e) {
+            $this->assertEquals(Response::HTTP_UNAUTHORIZED, $e->getCode());
+        }
     }
 
     public function testSend(): void

@@ -19,6 +19,9 @@ use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetailsData;
 use Pingen\Endpoints\FileUploadEndpoint;
 use Pingen\Endpoints\ParameterBags\BatchCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\BatchParameterBag;
+use Pingen\Exceptions\JsonApiException;
+use Pingen\Exceptions\JsonApiExceptionError;
+use Pingen\Exceptions\JsonApiExceptionErrorSource;
 
 class BatchEndpointTest extends EndpointTest
 {
@@ -117,6 +120,33 @@ class BatchEndpointTest extends EndpointTest
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/batches/?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testIterateOverCollectionRateLimit(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('example');
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_TOO_MANY_REQUESTS,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_TOO_MANY_REQUESTS);
+
+        foreach ($endpoint->iterateOverCollection() as $batchCollectionItem) {
+            //
+        }
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint): void {
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/batches/');
             }
         );
 
@@ -233,8 +263,7 @@ class BatchEndpointTest extends EndpointTest
 
         $endpoint->uploadAndCreate((new BatchCreateAttributes())
             ->setFileOriginalName('lorem.pdf')
-            ->setAddressPosition('left')
-            ->setAutoSend(false), $file);
+            ->setAddressPosition('left'), $file);
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {
@@ -247,6 +276,27 @@ class BatchEndpointTest extends EndpointTest
 
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
+
+    public function testCreateAndUploadUnauthorized(): void
+    {
+        $organisationId = 'orgId';
+
+        $endpoint = new BatchesEndpoint($this->getAccessToken());
+        $endpoint->setOrganisationId($organisationId)
+            ->useStaging();
+
+        /** @var resource $file */
+        $file = tmpfile();
+
+        try {
+            $endpoint->uploadAndCreate((new BatchCreateAttributes())
+                ->setFileOriginalName('lorem.pdf')
+                ->setAddressPosition('left'), $file);
+        } catch (JsonApiException $e) {
+            $this->assertEquals(Response::HTTP_UNAUTHORIZED, $e->getCode());
+        }
+    }
+
 
     public function testSend(): void
     {

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Provider;
 
 use GuzzleHttp\Psr7\Stream;
+use Illuminate\Http\Response;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
 use Mockery as m;
 use Pingen\Provider\Pingen;
@@ -68,7 +70,7 @@ class ProviderTest extends TestCase
         $response->shouldReceive('getHeader')->andReturn([
             'content-type' => 'json',
         ]);
-        $response->shouldReceive('getStatusCode')->andReturn(200);
+        $response->shouldReceive('getStatusCode')->andReturn(Response::HTTP_OK);
 
         $client = m::mock('GuzzleHttp\ClientInterface');
         $client->shouldReceive('send')->times(1)->andReturn($response);
@@ -79,6 +81,52 @@ class ProviderTest extends TestCase
 
         $this->assertEquals($accessToken->getToken(), 'mock_access_token');
         $this->assertNull($accessToken->getRefreshToken());
+    }
+
+    public function testClientCredentialsAccessTokenBadRequest(): void
+    {
+        $stream = fopen('data://text/plain,{"token_type": "Bearer", "access_token": "mock_access_token", "expires_in": 3600}','r');
+
+        $response = m::mock('Psr\Http\Message\ResponseInterface');
+        $response->shouldReceive('getBody')->andReturn(new Stream($stream));
+        $response->shouldReceive('getHeader')->andReturn([
+            'content-type' => 'json',
+        ]);
+        $response->shouldReceive('getStatusCode')->andReturn(Response::HTTP_BAD_REQUEST);
+
+        $client = m::mock('GuzzleHttp\ClientInterface');
+        $client->shouldReceive('send')->times(1)->andReturn($response);
+
+        $this->provider->setHttpClient($client);
+
+        try {
+            $this->provider->getAccessToken('client_credentials');
+        } catch (IdentityProviderException $e) {
+            $this->assertEquals(Response::HTTP_BAD_REQUEST, $e->getCode());
+        }
+    }
+
+    public function testClientCredentialsAccessTokenTooManyRequest(): void
+    {
+        $stream = fopen('data://text/plain,{"token_type": "Bearer", "access_token": "mock_access_token", "expires_in": 3600}','r');
+
+        $response = m::mock('Psr\Http\Message\ResponseInterface');
+        $response->shouldReceive('getBody')->andReturn(new Stream($stream));
+        $response->shouldReceive('getHeader')->andReturn([
+            'content-type' => 'json',
+        ]);
+        $response->shouldReceive('getStatusCode')->andReturn(Response::HTTP_TOO_MANY_REQUESTS);
+
+        $client = m::mock('GuzzleHttp\ClientInterface');
+        $client->shouldReceive('send')->times(1)->andReturn($response);
+
+        $this->provider->setHttpClient($client);
+
+        try {
+            $this->provider->getAccessToken('client_credentials');
+        } catch (IdentityProviderException $e) {
+            $this->assertEquals(Response::HTTP_TOO_MANY_REQUESTS, $e->getCode());
+        }
     }
 
     public function testGetAccessTokenFromImplicitResponseFragment(): void
@@ -97,7 +145,7 @@ class ProviderTest extends TestCase
         $userResponse->shouldReceive('getHeader')->andReturn([
             'content-type' => 'json',
         ]);
-        $userResponse->shouldReceive('getStatusCode')->andReturn(200);
+        $userResponse->shouldReceive('getStatusCode')->andReturn(Response::HTTP_OK);
 
         $client = m::mock('GuzzleHttp\ClientInterface');
         $client->shouldReceive('send')->times(1)->andReturn($userResponse);

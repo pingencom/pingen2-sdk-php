@@ -12,6 +12,8 @@ use Pingen\Endpoints\DataTransferObjects\Webhook\WebhookDetailsData;
 use Pingen\Endpoints\ParameterBags\WebhookCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\WebhookParameterBag;
 use Pingen\Endpoints\WebhooksEndpoint;
+use Pingen\Exceptions\JsonApiExceptionError;
+use Pingen\Exceptions\JsonApiExceptionErrorSource;
 
 class WebhookEndpointTest extends EndpointTest
 {
@@ -101,6 +103,33 @@ class WebhookEndpointTest extends EndpointTest
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testIterateOverCollectionRateLimit(): void
+    {
+        $endpoint = (new WebhooksEndpoint($this->getAccessToken()))
+            ->setOrganisationId('example');
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_TOO_MANY_REQUESTS,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_TOO_MANY_REQUESTS);
+
+        foreach ($endpoint->iterateOverCollection() as $webhookCollectionItem) {
+            //
+        }
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint): void {
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks');
             }
         );
 
