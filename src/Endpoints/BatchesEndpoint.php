@@ -197,7 +197,7 @@ class BatchesEndpoint extends ResourceEndpoint
     {
         return new BatchStatistics(
             $this->performGetDetailsRequest(
-                sprintf('/organisations/%s/batches/%s', $this->getOrganisationId(), $batchId),
+                sprintf('/organisations/%s/batches/%s/statistics', $this->getOrganisationId(), $batchId),
                 $parameterBag ?? (new BatchParameterBag())
             )->json()
         );

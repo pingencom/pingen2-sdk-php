@@ -371,7 +371,7 @@ class BatchEndpointTest extends EndpointTest
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $batchId, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/batches/%s', $endpoint->getResourceBaseUrl(), $organisationId, $batchId),
+                    sprintf('%s/organisations/%s/batches/%s/statistics', $endpoint->getResourceBaseUrl(), $organisationId, $batchId),
                     $request->url()
                 );
             }
