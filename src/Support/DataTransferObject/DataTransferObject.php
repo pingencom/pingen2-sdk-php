@@ -79,29 +79,6 @@ abstract class DataTransferObject
     }
 
     /**
-     * @param array<mixed> $parameters
-     * @return ImmutableDataTransferObject
-     */
-    public static function immutable(array $parameters = []): ImmutableDataTransferObject
-    {
-        return new ImmutableDataTransferObject(new static($parameters));
-    }
-
-    /**
-     * @param array<mixed> $arrayOfParameters
-     * @return ImmutableDataTransferObject[]|static[]
-     */
-    public static function arrayOf(array $arrayOfParameters): array
-    {
-        return array_map(
-            function ($parameters) {
-                return new static($parameters);
-            },
-            $arrayOfParameters
-        );
-    }
-
-    /**
      * @return array<mixed>
      */
     public function all(): array
@@ -155,10 +132,7 @@ abstract class DataTransferObject
     protected function parseArray(array $array): array
     {
         foreach ($array as $key => $value) {
-            if (
-                $value instanceof self
-                || $value instanceof DataTransferObjectCollection
-            ) {
+            if ($value instanceof self) {
                 $array[$key] = $value->toArray();
 
                 continue;

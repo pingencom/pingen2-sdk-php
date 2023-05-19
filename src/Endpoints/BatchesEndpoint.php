@@ -11,6 +11,7 @@ use Pingen\Endpoints\DataTransferObjects\Batch\BatchCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchDetails;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchEditAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchSendAttributes;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchStatistics;
 use Pingen\Endpoints\ParameterBags\BatchCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\BatchParameterBag;
 use Pingen\Exceptions\JsonApiException;
@@ -183,6 +184,23 @@ class BatchesEndpoint extends ResourceEndpoint
     {
         $this->performDeleteRequest(
             sprintf('/organisations/%s/batches/%s', $this->getOrganisationId(), $batchId)
+        );
+    }
+
+
+    /**
+     * @param string $batchId
+     * @param BatchParameterBag|null $parameterBag
+     * @return BatchStatistics
+     * @throws RequestException
+     */
+    public function getStatistics(string $batchId, ?BatchParameterBag $parameterBag = null): BatchStatistics
+    {
+        return new BatchStatistics(
+            $this->performGetDetailsRequest(
+                sprintf('/organisations/%s/batches/%s/statistics', $this->getOrganisationId(), $batchId),
+                $parameterBag ?? (new BatchParameterBag())
+            )->json()
         );
     }
 
