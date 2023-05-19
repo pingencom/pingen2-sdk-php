@@ -76,7 +76,7 @@ class LettersEndpoint extends ResourceEndpoint
                 $collection = $this->getCollection($listParameterBag);
 
                 foreach ($collection->data as $collectionItem) {
-                    yield $collectionItem;
+                    yield $collectionItem; // @codeCoverageIgnore
                 }
 
                 $listParameterBag->setPageNumber($collection->meta->current_page + 1);
