@@ -331,7 +331,16 @@ class BatchEndpointTest extends EndpointTest
                 ]),Response::HTTP_OK);
 
         $endpoint->send($batchId, (new BatchSendAttributes())
-            ->setDeliveryProduct('fast')
+            ->setDeliveryProduct([
+                [
+                    'country' => 'CH',
+                    'delivery_product' => 'postag_a'
+                ],
+                [
+                    'country' => 'DE',
+                    'delivery_product' => 'fast'
+                ]
+            ])
             ->setPrintMode('simplex')
             ->setPrintSpectrum('color')
         );
