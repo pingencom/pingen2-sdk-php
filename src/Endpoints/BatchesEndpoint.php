@@ -187,7 +187,6 @@ class BatchesEndpoint extends ResourceEndpoint
         );
     }
 
-
     /**
      * @param string $batchId
      * @param BatchParameterBag|null $parameterBag
