@@ -12,6 +12,8 @@ use Pingen\Endpoints\DataTransferObjects\Batch\BatchCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchDetailsData;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchEditAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchSendAttributes;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchStatisticsAttributes;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchStatisticsData;
 use Pingen\Endpoints\ParameterBags\BatchCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\BatchParameterBag;
 
@@ -202,7 +204,16 @@ class BatchEndpointTest extends EndpointTest
                 ]),Response::HTTP_OK);
 
         $endpoint->send($batchId, (new BatchSendAttributes())
-            ->setDeliveryProduct('fast')
+            ->setDeliveryProduct([
+                [
+                    'country' => 'CH',
+                    'delivery_product' => 'postag_a'
+                ],
+                [
+                    'country' => 'DE',
+                    'delivery_product' => 'fast'
+                ]
+            ])
             ->setPrintMode('simplex')
             ->setPrintSpectrum('color')
         );
@@ -305,6 +316,60 @@ class BatchEndpointTest extends EndpointTest
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $batchId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/batches/%s', $endpoint->getResourceBaseUrl(), $organisationId, $batchId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testGetStatistics(): void
+    {
+        $batchId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(
+                json_encode([
+                    'data' => new BatchStatisticsData([
+                        'id' => $batchId,
+                        'type' => 'batches',
+                        'attributes' => new BatchStatisticsAttributes([
+                            'letter_validating' => 1,
+                            'letter_groups' => [
+                                [
+                                    'name' => 'validating',
+                                    'count' => 1
+                                ],
+                                [
+                                    'name' => 'valid',
+                                    'count' => 10
+                                ]
+                            ],
+                            'letter_countries' => [
+                                [
+                                    'country' => 'CH',
+                                    'count' => 5
+                                ],
+                                [
+                                    'country' => 'DE',
+                                    'count' => 6
+                                ]
+                            ]
+                        ])
+                    ])
+                ]),Response::HTTP_OK);
+
+        $endpoint->getStatistics($batchId, new BatchParameterBag());
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $batchId, $organisationId): void {
                 $this->assertEquals(
                     sprintf('%s/organisations/%s/batches/%s', $endpoint->getResourceBaseUrl(), $organisationId, $batchId),
                     $request->url()
