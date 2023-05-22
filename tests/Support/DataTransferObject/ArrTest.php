@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Support\DataTransferObject;
+
+use Illuminate\Support\Carbon;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterAttributes;
+use Tests\TestCase;
+
+class ArrTest extends TestCase
+{
+    public function testPositive(): void
+    {
+        $expectedArray = [
+            'status' => 'sent',
+            'file_original_name' => 'lorem.pdf',
+            'file_pages' => 2,
+            'address_position' => 'left',
+            'address' => 'Hans Meier\nExample street 4\n8000 Zürich\nSwitzerland',
+            'country' => 'CH',
+            'price_currency' => 'CHF',
+            'price_value' => 1.25,
+            'delivery_product' => 'fast',
+            'print_mode' => 'simplex',
+            'print_spectrum' => 'color',
+            'paper_types' => ['normal', 'qr'],
+            'fonts' => [(object)[
+                'name' => 'Helvetica',
+                'is_embedded' => true
+            ]],
+            'tracking_number' => '98.1234.11',
+            'created_at' => Carbon::make('2020-11-19T09:42:48+0100'),
+            'updated_at' => Carbon::make('2020-11-19T09:42:48+0100')
+        ];
+
+        $letterDTO = new LetterAttributes($expectedArray);
+
+        foreach ($letterDTO->toArray() as $key => $value) {
+            $this->assertEquals($expectedArray[$key], $value);
+        }
+
+        $this->assertsame(['status' => 'sent'], $letterDTO->only('status')->toArray());
+        $this->assertSame([
+            'status' => 'sent',
+            'price_currency' => 'CHF',
+            'price_value' => 1.25,
+            'delivery_product' => 'fast',
+            'print_mode' => 'simplex',
+            'print_spectrum' => 'color'
+        ], $letterDTO->except('file_original_name', 'file_pages', 'address_position', 'address', 'country', 'created_at', 'updated_at')->toArray());
+    }
+}
