@@ -12,6 +12,8 @@ use Pingen\Endpoints\DataTransferObjects\Webhook\WebhookDetailsData;
 use Pingen\Endpoints\ParameterBags\WebhookCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\WebhookParameterBag;
 use Pingen\Endpoints\WebhooksEndpoint;
+use Pingen\Exceptions\JsonApiExceptionError;
+use Pingen\Exceptions\JsonApiExceptionErrorSource;
 
 class WebhookEndpointTest extends EndpointTest
 {
@@ -19,10 +21,12 @@ class WebhookEndpointTest extends EndpointTest
     {
         $listParameterBag = (new WebhookCollectionParameterBag())
             ->setPageLimit(10)
-            ->setPageNumber(2);
+            ->setPageNumber(2)
+            ->setFields(['name']);
 
         $endpoint = (new WebhooksEndpoint($this->getAccessToken()))
-            ->setOrganisationId('example');
+            ->setOrganisationId('example')
+            ->setIdempotencyKey('test');
 
         $endpoint->getHttpClient()->fakeSequence()
             ->push(
@@ -34,7 +38,7 @@ class WebhookEndpointTest extends EndpointTest
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bwebhooks%5D=name');
             }
         );
 
@@ -63,12 +67,12 @@ class WebhookEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->getDetails($webhookId, new WebhookParameterBag());
+        $endpoint->getDetails($webhookId, (new WebhookParameterBag())->setFields(['attempts']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $webhookId, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/webhooks/%s', $endpoint->getResourceBaseUrl(), $organisationId, $webhookId),
+                    sprintf('%s/organisations/%s/webhooks/%s', $endpoint->getResourceBaseUrl(), $organisationId, $webhookId) . '?fields%5Bwebhooks%5D=attempts',
                     $request->url()
                 );
             }
@@ -92,15 +96,44 @@ class WebhookEndpointTest extends EndpointTest
                 Response::HTTP_OK,
             );
 
-        $endpoint->iterateOverCollection($listParameterBag);
+        foreach ($endpoint->iterateOverCollection($listParameterBag) as $webhookCollectionItem) {
+            //
+        }
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks/?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks?page%5Blimit%5D=10&page%5Bnumber%5D=2');
             }
         );
 
-        $this->assertCount(0, $endpoint->getHttpClient()->recorded());
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testIterateOverCollectionRateLimit(): void
+    {
+        $endpoint = (new WebhooksEndpoint($this->getAccessToken()))
+            ->setOrganisationId('example');
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_TOO_MANY_REQUESTS,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_TOO_MANY_REQUESTS);
+
+        foreach ($endpoint->iterateOverCollection() as $webhookCollectionItem) {
+            //
+        }
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint): void {
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/webhooks');
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
 
     public function testCreate(): void

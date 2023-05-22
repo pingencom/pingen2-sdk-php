@@ -16,6 +16,8 @@ use Pingen\Endpoints\DataTransferObjects\UserAssociation\UserAssociationsCollect
 use Pingen\Endpoints\ParameterBags\UserAssociationCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\UserAssociationParameterBag;
 use Pingen\Endpoints\UserAssociationsEndpoint;
+use Pingen\Exceptions\JsonApiExceptionError;
+use Pingen\Exceptions\JsonApiExceptionErrorSource;
 
 class UserAssociationsEndpointTest extends EndpointTest
 {
@@ -57,12 +59,12 @@ class UserAssociationsEndpointTest extends EndpointTest
                 Response::HTTP_OK,
             );
 
-        $endpoint->getCollection(new UserAssociationCollectionParameterBag());
+        $endpoint->getCollection((new UserAssociationCollectionParameterBag())->setFieldsAssociation(['role'])->setFieldsOrganisations(['name']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    sprintf( '%s/user/associations', $endpoint->getResourceBaseUrl()),
+                    sprintf( '%s/user/associations', $endpoint->getResourceBaseUrl()) . '?fields%5Bassociations%5D=role&fields%5Borganisations%5D=name',
                     $request->url()
                 );
             }
@@ -107,7 +109,9 @@ class UserAssociationsEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->iterateOverCollection(new UserAssociationCollectionParameterBag());
+        foreach ($endpoint->iterateOverCollection(new UserAssociationCollectionParameterBag()) as $userCollectionItem) {
+            //
+        }
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
@@ -118,7 +122,36 @@ class UserAssociationsEndpointTest extends EndpointTest
             }
         );
 
-        $this->assertCount(0, $endpoint->getHttpClient()->recorded());
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testIterateOverCollectionRateLimit(): void
+    {
+        $endpoint = new UserAssociationsEndpoint($this->getAccessToken());
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_TOO_MANY_REQUESTS,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_TOO_MANY_REQUESTS);
+
+        foreach ($endpoint->iterateOverCollection() as $userCollectionItem) {
+            //
+        }
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint): void {
+                $this->assertEquals(
+                    sprintf( '%s/user/associations', $endpoint->getResourceBaseUrl()),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
 
     public function testGetDetails(): void
@@ -152,12 +185,12 @@ class UserAssociationsEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->getDetails($associationId, new UserAssociationParameterBag());
+        $endpoint->getDetails($associationId, (new UserAssociationParameterBag())->setFields(['role']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $associationId): void {
                 $this->assertEquals(
-                    sprintf( '%s/user/associations/%s', $endpoint->getResourceBaseUrl(), $associationId),
+                    sprintf( '%s/user/associations/%s', $endpoint->getResourceBaseUrl(), $associationId) . '?fields%5Busers%5D=role',
                     $request->url()
                 );
             }

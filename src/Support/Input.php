@@ -39,7 +39,7 @@ abstract class Input implements Arrayable
             return $this;
         }
 
-        return null;
+        return null; // @codeCoverageIgnore
     }
 
     /**

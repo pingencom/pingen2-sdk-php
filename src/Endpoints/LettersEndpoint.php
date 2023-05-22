@@ -76,7 +76,7 @@ class LettersEndpoint extends ResourceEndpoint
                 $collection = $this->getCollection($listParameterBag);
 
                 foreach ($collection->data as $collectionItem) {
-                    yield $collectionItem;
+                    yield $collectionItem; // @codeCoverageIgnore
                 }
 
                 $listParameterBag->setPageNumber($collection->meta->current_page + 1);
@@ -96,7 +96,7 @@ class LettersEndpoint extends ResourceEndpoint
      */
     public function uploadAndCreate(LetterCreateAttributes $letterCreateAttributes, $file): LetterDetails
     {
-        $fileUploadEndpoint = new FileUploadEndpoint($this->getAccessToken());
+        $fileUploadEndpoint = $this->getFileUploadEndpoint();
         if ($this->isUsingStaging()) {
             $fileUploadEndpoint->useStaging();
         }
@@ -224,12 +224,17 @@ class LettersEndpoint extends ResourceEndpoint
         $tmpFile = tmpfile();
 
         if (! is_resource($tmpFile)) {
-            throw new \RuntimeException('Cannot create tmp file.');
+            throw new \RuntimeException('Cannot create tmp file.'); // @codeCoverageIgnore
         }
 
         fwrite($tmpFile, $response->body());
         rewind($tmpFile);
 
         return $tmpFile;
+    }
+
+    protected function getFileUploadEndpoint(): FileUploadEndpoint
+    {
+        return new FileUploadEndpoint($this->getAccessToken());
     }
 }

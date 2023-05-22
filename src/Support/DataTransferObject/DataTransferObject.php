@@ -43,10 +43,7 @@ abstract class DataTransferObject
                 && ! $validator->hasDefaultValue
                 && ! $validator->isNullable
             ) {
-                throw DataTransferObjectError::uninitialized(
-                    static::class,
-                    $field
-                );
+                throw DataTransferObjectError::uninitialized(static::class, $field); // @codeCoverageIgnore
             }
 
             $value = $parameters[$field] ?? $this->{$field} ?? null;

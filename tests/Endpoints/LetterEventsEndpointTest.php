@@ -19,7 +19,10 @@ class LetterEventsEndpointTest extends EndpointTest
     {
         $listParameterBag = (new LetterEventCollectionParameterBag())
             ->setPageLimit(10)
-            ->setPageNumber(2);
+            ->setPageNumber(2)
+            ->setFieldsLetter(['status'])
+            ->setFieldsLetterEvent(['code'])
+            ->setLanguage('en-GB');
 
         $endpoint = (new LetterEventsEndpoint($this->getAccessToken()))
             ->setOrganisationId('example')
@@ -36,7 +39,7 @@ class LetterEventsEndpointTest extends EndpointTest
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    $endpoint->getResourceBaseUrl() . '/organisations/example/letters/exampleLetterID/events?page%5Blimit%5D=10&page%5Bnumber%5D=2',
+                    $endpoint->getResourceBaseUrl() . '/organisations/example/letters/exampleLetterID/events?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
                     $request->url()
                 );
             }

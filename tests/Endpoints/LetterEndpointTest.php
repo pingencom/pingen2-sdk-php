@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Endpoints;
 
+use Carbon\Carbon;
+use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Response;
+use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadAttributes;
+use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetailsData;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterDetailsData;
@@ -14,21 +18,23 @@ use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceCalculationAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceData;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterSendAttributes;
+use Pingen\Endpoints\FileUploadEndpoint;
 use Pingen\Endpoints\LettersEndpoint;
 use Pingen\Endpoints\ParameterBags\LetterCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\LetterParameterBag;
+use Pingen\Exceptions\JsonApiException;
+use Pingen\Exceptions\JsonApiExceptionError;
+use Pingen\Exceptions\JsonApiExceptionErrorSource;
+use Pingen\Exceptions\RateLimitJsonApiException;
 
-/**
- * Class LetterEndpointTest
- * @package Tests
- */
 class LetterEndpointTest extends EndpointTest
 {
     public function testGetLetterCollection(): void
     {
         $listParameterBag = (new LetterCollectionParameterBag())
             ->setPageLimit(10)
-            ->setPageNumber(2);
+            ->setPageNumber(2)
+            ->setFieldsLetter(['status']);
 
         $endpoint = (new LettersEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
@@ -43,7 +49,7 @@ class LetterEndpointTest extends EndpointTest
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status');
             }
         );
 
@@ -89,12 +95,12 @@ class LetterEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->getDetails($letterId, new LetterParameterBag());
+        $endpoint->getDetails($letterId, (new LetterParameterBag())->setFields(['status']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $letterId, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId) . '?fields%5Bletters%5D=status',
                     $request->url()
                 );
             }
@@ -107,7 +113,11 @@ class LetterEndpointTest extends EndpointTest
     {
         $listParameterBag = (new LetterCollectionParameterBag())
             ->setPageLimit(10)
-            ->setPageNumber(2);
+            ->setPageNumber(2)
+            ->setSort('created_at')
+            ->setFilter(['name' => 'testName'])
+            ->setQ('test')
+            ->setInclude(['organisations']);
 
         $endpoint = (new LettersEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
@@ -118,15 +128,44 @@ class LetterEndpointTest extends EndpointTest
                 Response::HTTP_OK,
             );
 
-        $endpoint->iterateOverCollection($listParameterBag);
+        foreach ($endpoint->iterateOverCollection($listParameterBag) as $letterCollectionItem) {
+            //
+        }
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2&sort=created_at&filter=%7B%22name%22%3A%22testName%22%7D&q=test&include=organisations');
             }
         );
 
-        $this->assertCount(0, $endpoint->getHttpClient()->recorded());
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testIterateOverCollectionRateLimit(): void
+    {
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId('example');
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_TOO_MANY_REQUESTS,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_TOO_MANY_REQUESTS);
+
+        foreach ($endpoint->iterateOverCollection() as $letterCollectionItem) {
+            //
+        }
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint): void {
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/');
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
 
     public function testCreate(): void
@@ -175,6 +214,94 @@ class LetterEndpointTest extends EndpointTest
         );
 
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCreateAndUpload(): void
+    {
+        $letterId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $fileUploadEndpoint = new FileUploadEndpoint($this->getAccessToken());
+        $fileUploadEndpoint->getHttpClient()->fakeSequence()->push(
+            json_encode([
+                'data' => new FileUploadDetailsData([
+                    'id' => 'someTestId',
+                    'type' => 'file_uploads',
+                    'attributes' => new FileUploadAttributes([
+                        'url' => 'https://s3.example/bucket/filename?signer=url',
+                        'url_signature' => '$2y$10$BLOzVbYTXrh4LZbSYNVf7eEDrc58vvQ9PRVZABqV/9WS1eqIcm3M',
+                        'expires_at' => Carbon::now()->addDay()
+                    ])
+                ])
+            ]),Response::HTTP_OK)
+            ->push('', Response::HTTP_OK);
+
+        $endpoint = $this->createPartialMock(LettersEndpoint::class, ['getFileUploadEndpoint']);
+        $endpoint->method('getFileUploadEndpoint')->willReturn($fileUploadEndpoint);
+        $endpoint->setAccessToken($this->getAccessToken())
+             ->setHttpClient(new HttpClient());
+        $endpoint->setOrganisationId($organisationId)
+            ->useStaging();
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(
+                json_encode([
+                    'data' => new LetterDetailsData([
+                        'id' => $letterId,
+                        'type' => 'letters',
+                        'attributes' => new LetterAttributes([
+                            'status' => 'validating',
+                            'file_original_name' => 'lorem.pdf',
+                            'file_pages' => 2,
+                            'address' => 'Hans Meier\nExample street 4\n8000 Zürich\nSwitzerland',
+                            'address_position' => 'left',
+                            'country' => 'CH',
+                            'paper_types' => [],
+                            'fonts' => [],
+                            'created_at' => '2020-11-19T09:42:48+0100',
+                            'updated_at' => '2020-11-19T09:42:48+0100'
+                        ])
+                    ])
+                ]),Response::HTTP_CREATED);
+
+        /** @var resource $file */
+        $file = tmpfile();
+
+        $endpoint->uploadAndCreate((new LetterCreateAttributes())
+            ->setFileOriginalName('lorem.pdf')
+            ->setAddressPosition('left')
+            ->setAutoSend(false), $file);
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/', $endpoint->getResourceBaseUrl(), $organisationId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCreateAndUploadUnauthorized(): void
+    {
+        $organisationId = 'orgId';
+
+        $endpoint = new LettersEndpoint($this->getAccessToken());
+        $endpoint->setOrganisationId($organisationId);
+
+        /** @var resource $file */
+        $file = tmpfile();
+
+        try {
+            $endpoint->uploadAndCreate((new LetterCreateAttributes())
+                ->setFileOriginalName('lorem.pdf')
+                ->setAddressPosition('left')
+                ->setAutoSend(false), $file);
+        } catch (JsonApiException $e) {
+            $this->assertEquals(Response::HTTP_UNAUTHORIZED, $e->getCode());
+        }
     }
 
     public function testSend(): void
@@ -365,5 +492,95 @@ class LetterEndpointTest extends EndpointTest
         );
 
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testGetFile(): void
+    {
+        $letterId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push('',Response::HTTP_FOUND);
+
+        $endpoint->getFile($letterId);
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $letterId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    $request->url()
+                );
+            }
+        );
+    }
+
+    public function testRateLimit(): void
+    {
+        $letterId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_TOO_MANY_REQUESTS,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_TOO_MANY_REQUESTS);
+
+        try {
+            $endpoint->getFile($letterId);
+        } catch (RateLimitJsonApiException $e) {
+            $this->assertEquals(Response::HTTP_TOO_MANY_REQUESTS, $e->getCode());
+        }
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $letterId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    $request->url()
+                );
+            }
+        );
+    }
+
+    public function testApiException(): void
+    {
+        $letterId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(json_encode(['errors' => [
+                new JsonApiExceptionError([
+                    'code' => (string) Response::HTTP_FORBIDDEN,
+                    'title' => 'title',
+                    'source' => new JsonApiExceptionErrorSource()
+                ])]
+            ]),Response::HTTP_FORBIDDEN);
+
+        try {
+            $endpoint->getFile($letterId);
+        } catch (JsonApiException $e) {
+            $this->assertEquals(Response::HTTP_FORBIDDEN, $e->getCode());
+            $this->assertEquals(1, count($e->getBody()->errors));
+        }
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $letterId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    $request->url()
+                );
+            }
+        );
     }
 }

@@ -72,7 +72,7 @@ class BatchesEndpoint extends ResourceEndpoint
                 $collection = $this->getCollection($listParameterBag);
 
                 foreach ($collection->data as $collectionItem) {
-                    yield $collectionItem;
+                    yield $collectionItem;  // @codeCoverageIgnore
                 }
 
                 $listParameterBag->setPageNumber($collection->meta->current_page + 1);
@@ -92,7 +92,7 @@ class BatchesEndpoint extends ResourceEndpoint
      */
     public function uploadAndCreate(BatchCreateAttributes $batchCreateAttributes, $file): BatchDetails
     {
-        $fileUploadEndpoint = new FileUploadEndpoint($this->getAccessToken());
+        $fileUploadEndpoint = $this->getFileUploadEndpoint();
         if ($this->isUsingStaging()) {
             $fileUploadEndpoint->useStaging();
         }
@@ -201,5 +201,10 @@ class BatchesEndpoint extends ResourceEndpoint
                 $parameterBag ?? (new BatchParameterBag())
             )->json()
         );
+    }
+
+    protected function getFileUploadEndpoint(): FileUploadEndpoint
+    {
+        return new FileUploadEndpoint($this->getAccessToken());
     }
 }

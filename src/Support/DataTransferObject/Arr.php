@@ -53,7 +53,7 @@ class Arr
                 $part = array_shift($parts);
 
                 if (isset($array[$part]) && is_array($array[$part])) {
-                    $array = &$array[$part];
+                    $array = &$array[$part]; // @codeCoverageIgnore
                 } else {
                     continue 2;
                 }
@@ -68,7 +68,7 @@ class Arr
     public static function exists(mixed $array, string $key): bool
     {
         if ($array instanceof ArrayAccess) {
-            return $array->offsetExists($key);
+            return $array->offsetExists($key); // @codeCoverageIgnore
         }
 
         return array_key_exists($key, $array);

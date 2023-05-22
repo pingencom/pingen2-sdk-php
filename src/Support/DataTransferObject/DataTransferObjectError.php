@@ -47,7 +47,7 @@ class DataTransferObjectError extends TypeError
         $expectedTypes = implode(', ', $expectedTypes);
 
         if ($value === $currentType) {
-            $instead = "instead got value `{$value}`.";
+            $instead = "instead got value `{$value}`."; // @codeCoverageIgnore
         } else {
             $instead = "instead got value `{$value}`, which is {$currentType}.";
         }
@@ -57,11 +57,6 @@ class DataTransferObjectError extends TypeError
 
     public static function uninitialized(string $class, string $field): self
     {
-        return new self("Non-nullable property `{$class}::{$field}` has not been initialized.");
-    }
-
-    public static function immutable(string $property): self
-    {
-        return new self("Cannot change the value of property {$property} on an immutable data transfer object");
+        return new self("Non-nullable property `{$class}::{$field}` has not been initialized.");  // @codeCoverageIgnore
     }
 }

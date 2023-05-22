@@ -40,12 +40,12 @@ class OrganisationsEndpointTest extends EndpointTest
                     ]
                 ]),Response::HTTP_OK);
 
-        $endpoint->getDetails($orgId, new OrganisationParameterBag());
+        $endpoint->getDetails($orgId, (new OrganisationParameterBag())->setFields(['name']));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $orgId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s', $endpoint->getResourceBaseUrl(), $orgId),
+                    sprintf('%s/organisations/%s', $endpoint->getResourceBaseUrl(), $orgId) . '?fields%5Bcompanies%5D=name',
                     $request->url());
             }
         );
