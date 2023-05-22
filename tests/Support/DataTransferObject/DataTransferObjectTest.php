@@ -66,7 +66,8 @@ class DataTransferObjectTest extends TestCase
             'price' => null,
             'object' => null,
             'array' => ['test' => 'example'],
-            'array_access' => $arr
+            'array_access' => $arr,
+            'mixed' => null
         ], $dto->all());
     }
 }
@@ -79,6 +80,7 @@ class DummyDTO extends DataTransferObject
     public ?object $object;
     public ?array $array;
     public ?\ArrayAccess $array_access;
+    public mixed $mixed;
 
     protected bool $ignoreMissing = false;
 }

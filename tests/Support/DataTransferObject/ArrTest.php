@@ -55,7 +55,7 @@ class ArrTest extends TestCase
     public function testForget(): void
     {
         $dto = new SimpleDTO(['status' => 'sent', 'name' => 'example']);
-        $this->assertSame(['status' => 'sent', 'name' => 'example'], $dto->except('example')->toArray());
+        $this->assertSame(['status' => 'sent', 'name' => 'example'], $dto->except('example.test')->toArray());
     }
 }
 
