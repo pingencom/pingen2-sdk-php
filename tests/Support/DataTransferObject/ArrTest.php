@@ -6,6 +6,7 @@ namespace Tests\Support\DataTransferObject;
 
 use Illuminate\Support\Carbon;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterAttributes;
+use Pingen\Support\DataTransferObject\DataTransferObject;
 use Tests\TestCase;
 
 class ArrTest extends TestCase
@@ -50,4 +51,16 @@ class ArrTest extends TestCase
             'print_spectrum' => 'color'
         ], $letterDTO->except('file_original_name', 'file_pages', 'address_position', 'address', 'country', 'created_at', 'updated_at')->toArray());
     }
+
+    public function testForget(): void
+    {
+        $dto = new SimpleDTO(['status' => 'sent', 'name' => 'example']);
+        $this->assertSame(['status' => 'sent', 'name' => 'example'], $dto->except('example')->toArray());
+    }
+}
+
+class SimpleDTO extends DataTransferObject
+{
+    public string $status;
+    public string $name;
 }

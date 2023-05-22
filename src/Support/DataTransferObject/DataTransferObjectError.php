@@ -47,7 +47,7 @@ class DataTransferObjectError extends TypeError
         $expectedTypes = implode(', ', $expectedTypes);
 
         if ($value === $currentType) {
-            $instead = "instead got value `{$value}`.";
+            $instead = "instead got value `{$value}`."; // @codeCoverageIgnore
         } else {
             $instead = "instead got value `{$value}`, which is {$currentType}.";
         }

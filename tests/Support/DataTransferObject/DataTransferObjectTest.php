@@ -14,13 +14,26 @@ class DataTransferObjectTest extends TestCase
     {
         try {
             new DummyDTO([
+                'status' => 'sent',
+                'name' => ['test' => 'example']
+            ]);
+        } catch (DataTransferObjectError $e) {
+            $this->assertEquals("Invalid type: expected `Tests\Support\DataTransferObject\DummyDTO::name` to be of type `string`, instead got value `array`..", $e->getMessage());
+        }
+    }
+
+    public function testInvalidTypesMessage(): void
+    {
+        try {
+            new DummyDTO([
                 'status' => null,
                 'name' => 1,
                 'object' => 'test',
-                'array' => 1
+                'array' => (object)['test'],
+                'array_access' => 1
             ]);
         } catch (DataTransferObjectError $e) {
-            $this->assertEquals("The following invalid types were encountered:\nexpected `Tests\Support\DataTransferObject\DummyDTO::status` to be of type `string`, instead got value `null`, which is NULL.\nexpected `Tests\Support\DataTransferObject\DummyDTO::name` to be of type `string`, instead got value `1`, which is integer.\nexpected `Tests\Support\DataTransferObject\DummyDTO::object` to be of type `object`, instead got value `test`, which is string.\nexpected `Tests\Support\DataTransferObject\DummyDTO::array` to be of type `array`, instead got value `1`, which is integer.\n", $e->getMessage());
+            $this->assertEquals("The following invalid types were encountered:\nexpected `Tests\Support\DataTransferObject\DummyDTO::status` to be of type `string`, instead got value `null`, which is NULL.\nexpected `Tests\Support\DataTransferObject\DummyDTO::name` to be of type `string`, instead got value `1`, which is integer.\nexpected `Tests\Support\DataTransferObject\DummyDTO::object` to be of type `object`, instead got value `test`, which is string.\nexpected `Tests\Support\DataTransferObject\DummyDTO::array` to be of type `array`, instead got value `stdClass`, which is object.\nexpected `Tests\Support\DataTransferObject\DummyDTO::array_access` to be of type `ArrayAccess`, instead got value `1`, which is integer.\n", $e->getMessage());
         }
     }
 
@@ -39,9 +52,12 @@ class DataTransferObjectTest extends TestCase
 
     public function testGetAll(): void
     {
+        $arr = new \ArrayObject(['example']);
         $dto = new DummyDTO([
             'status' => 'sent',
-            'name' => 'name'
+            'name' => 'name',
+            'array' => ['test' => 'example'],
+            'array_access' => $arr
         ]);
 
         $this->assertSame([
@@ -49,7 +65,8 @@ class DataTransferObjectTest extends TestCase
             'name' => 'name',
             'price' => null,
             'object' => null,
-            'array' => null
+            'array' => ['test' => 'example'],
+            'array_access' => $arr
         ], $dto->all());
     }
 }
@@ -61,6 +78,7 @@ class DummyDTO extends DataTransferObject
     public ?int $price;
     public ?object $object;
     public ?array $array;
+    public ?\ArrayAccess $array_access;
 
     protected bool $ignoreMissing = false;
 }
