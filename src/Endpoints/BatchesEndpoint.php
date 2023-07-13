@@ -16,6 +16,7 @@ use Pingen\Endpoints\ParameterBags\BatchCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\BatchParameterBag;
 use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\RateLimitJsonApiException;
+use Pingen\Exceptions\ValidationException;
 use Pingen\ResourceEndpoint;
 use Pingen\Support\HasOrganisationContext;
 
@@ -88,10 +89,15 @@ class BatchesEndpoint extends ResourceEndpoint
      * @param BatchCreateAttributes $batchCreateAttributes
      * @param resource|string $file File content as string, or resource
      * @return BatchDetails
+     * @throws RateLimitJsonApiException
      * @throws RequestException
+     * @throws ValidationException
+     * @throws \ReflectionException
      */
     public function uploadAndCreate(BatchCreateAttributes $batchCreateAttributes, $file): BatchDetails
     {
+        $batchCreateAttributes->validate(['file_url', 'file_url_signature']);
+
         $fileUploadEndpoint = $this->getFileUploadEndpoint();
         if ($this->isUsingStaging()) {
             $fileUploadEndpoint->useStaging();
@@ -110,10 +116,15 @@ class BatchesEndpoint extends ResourceEndpoint
     /**
      * @param BatchCreateAttributes $batchCreateAttributes
      * @return BatchDetails
+     * @throws RateLimitJsonApiException
      * @throws RequestException
+     * @throws ValidationException
+     * @throws \ReflectionException
      */
     public function create(BatchCreateAttributes $batchCreateAttributes): BatchDetails
     {
+        $batchCreateAttributes->validate();
+
         return new BatchDetails(
             $this->performPostRequest(
                 sprintf('/organisations/%s/batches/', $this->getOrganisationId()),
@@ -125,18 +136,22 @@ class BatchesEndpoint extends ResourceEndpoint
 
     /**
      * @param string $batchId
-     * @param BatchSendAttributes $batchesendAttributes
+     * @param BatchSendAttributes $batchesSendAttributes
      * @return BatchDetails
      * @throws JsonApiException
+     * @throws ValidationException
+     * @throws \ReflectionException
      */
-    public function send(string $batchId, BatchSendAttributes $batchesendAttributes): BatchDetails
+    public function send(string $batchId, BatchSendAttributes $batchesSendAttributes): BatchDetails
     {
+        $batchesSendAttributes->validate();
+
         return new BatchDetails(
             $this->performPatchRequest(
                 sprintf('/organisations/%s/batches/%s/send', $this->getOrganisationId(), $batchId),
                 'batches',
                 $batchId,
-                $batchesendAttributes
+                $batchesSendAttributes
             )->json()
         );
     }

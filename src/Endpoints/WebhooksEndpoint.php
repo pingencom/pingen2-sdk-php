@@ -12,6 +12,7 @@ use Pingen\Endpoints\DataTransferObjects\Webhook\WebhookDetails;
 use Pingen\Endpoints\ParameterBags\WebhookCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\WebhookParameterBag;
 use Pingen\Exceptions\RateLimitJsonApiException;
+use Pingen\Exceptions\ValidationException;
 use Pingen\ResourceEndpoint;
 use Pingen\Support\HasOrganisationContext;
 
@@ -84,10 +85,15 @@ class WebhooksEndpoint extends ResourceEndpoint
     /**
      * @param WebhookCreateAttributes $webhookCreateAttributes
      * @return WebhookDetails
+     * @throws RateLimitJsonApiException
      * @throws RequestException
+     * @throws ValidationException
+     * @throws \ReflectionException
      */
     public function create(WebhookCreateAttributes $webhookCreateAttributes): WebhookDetails
     {
+        $webhookCreateAttributes->validate();
+
         return new WebhookDetails(
             $this->performPostRequest(
                 sprintf('/organisations/%s/webhooks', $this->getOrganisationId()),
