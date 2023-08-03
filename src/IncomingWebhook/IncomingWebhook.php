@@ -26,7 +26,7 @@ class IncomingWebhook
     {
         $this->verify($request);
 
-        return new IncomingWebhookDetails(json_decode($request->getContent(), true));
+        return new IncomingWebhookDetails(json_decode((string)$request->getContent(), true));
     }
 
     /**
@@ -44,7 +44,7 @@ class IncomingWebhook
             throw new WebhookSignatureException('Signature missing.');
         }
 
-        if ($request->header('Signature') !== hash_hmac('sha256', $request->getContent(), $this->secret)) {
+        if ($request->header('Signature') !== hash_hmac('sha256', (string)$request->getContent(), $this->secret)) {
             throw new WebhookSignatureException('Webhook signature matching failed.');
         }
     }
