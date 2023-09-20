@@ -24,6 +24,7 @@ use Pingen\Endpoints\ParameterBags\BatchParameterBag;
 use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\JsonApiExceptionError;
 use Pingen\Exceptions\JsonApiExceptionErrorSource;
+use Pingen\Exceptions\ValidationException;
 
 class BatchEndpointTest extends EndpointTest
 {
@@ -209,6 +210,21 @@ class BatchEndpointTest extends EndpointTest
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
 
+    public function testCreateValidation(): void
+    {
+        $batchId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        try {
+            $endpoint->create((new BatchCreateAttributes()));
+        } catch (ValidationException $e) {
+            $this->assertEquals('["The name field is required.","The icon field is required.","The file_original_name field is required.","The file_url field is required.","The file_url_signature field is required.","The address_position field is required.","The grouping_type field is required."]', $e->getMessage());
+        }
+    }
+
     public function testCreateAndUpload(): void
     {
         $batchId = 'exampleId';
@@ -264,6 +280,10 @@ class BatchEndpointTest extends EndpointTest
         $file = tmpfile();
 
         $endpoint->uploadAndCreate((new BatchCreateAttributes())
+            ->setName('example')
+            ->setIcon('campaign')
+            ->setAddressPosition('left')
+            ->setGroupingType('zip')
             ->setFileOriginalName('lorem.pdf')
             ->setAddressPosition('left'), $file);
 
@@ -292,13 +312,15 @@ class BatchEndpointTest extends EndpointTest
 
         try {
             $endpoint->uploadAndCreate((new BatchCreateAttributes())
+                ->setName('example')
+                ->setIcon('campaign')
+                ->setGroupingType('zip')
                 ->setFileOriginalName('lorem.pdf')
                 ->setAddressPosition('left'), $file);
         } catch (JsonApiException $e) {
             $this->assertEquals(Response::HTTP_UNAUTHORIZED, $e->getCode());
         }
     }
-
 
     public function testSend(): void
     {

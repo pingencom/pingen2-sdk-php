@@ -7,6 +7,8 @@ namespace Pingen\Support;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Pingen\Exceptions\ValidationException;
+use Pingen\Support\DataTransferObject\FieldValidator;
 
 /**
  * Class Input
@@ -47,7 +49,7 @@ abstract class Input implements Arrayable
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $data = [];
 
@@ -57,5 +59,52 @@ abstract class Input implements Arrayable
             });
 
         return $data;
+    }
+
+    /**
+     * @param string[] $excludedParameters
+     * @return void
+     * @throws ValidationException
+     * @throws \ReflectionException
+     */
+    public function validate(array $excludedParameters = []): void
+    {
+        $attributes = $this->toArray();
+        $properties = [];
+        $errorMsg = [];
+
+        $class = new \ReflectionClass($this::class);
+
+        foreach ($class->getProperties(\ReflectionProperty::IS_PROTECTED) as $reflectionProperty) {
+            $field = $reflectionProperty->getName();
+
+            $properties[$field] = FieldValidator::fromReflection($reflectionProperty);
+        }
+
+        foreach ($properties as $field => $validator) {
+            if (! isset($attributes[$field]) && ! $validator->isNullable) {
+                if (in_array($field, $excludedParameters, true)) {
+                    continue;
+                }
+
+                $errorMsg[] = sprintf('The %s field is required.', $field);
+                continue;
+            }
+
+            if (! $validator->isNullable && ! in_array(gettype($attributes[$field]), $validator->allowedTypes, true)) {
+                $errorMsg[] = sprintf(
+                    'The %s field has wrong type %s possible type: %s.',
+                    $field,
+                    gettype($attributes[$field]),
+                    json_encode(
+                        $validator->allowedTypes
+                    )
+                );
+            }
+        }
+
+        if (count($errorMsg) > 0) {
+            throw new ValidationException((string) json_encode($errorMsg));
+        }
     }
 }

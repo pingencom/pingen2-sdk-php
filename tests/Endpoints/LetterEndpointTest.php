@@ -14,6 +14,9 @@ use Pingen\Endpoints\DataTransferObjects\Letter\LetterAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterDetailsData;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterEditAttributes;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterMetaDataAttributes;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterMetaDataRecipientAttributes;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterMetaDataSenderAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceCalculationAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceData;
@@ -26,6 +29,7 @@ use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\JsonApiExceptionError;
 use Pingen\Exceptions\JsonApiExceptionErrorSource;
 use Pingen\Exceptions\RateLimitJsonApiException;
+use Pingen\Exceptions\ValidationException;
 
 class LetterEndpointTest extends EndpointTest
 {
@@ -197,12 +201,33 @@ class LetterEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_CREATED);
 
+        $recipientMetaData = (new LetterMetaDataRecipientAttributes())
+            ->setName('Jonh')
+            ->setCountry('CH')
+            ->setCity('Zurich')
+            ->setStreet('Example')
+            ->setNumber('666')
+            ->setZip('8005');
+
+        $senderMetaData = (new LetterMetaDataSenderAttributes())
+            ->setName('Jonh')
+            ->setCountry('CH')
+            ->setCity('Zurich')
+            ->setStreet('Example')
+            ->setNumber('666')
+            ->setZip('8005');
+
+        $metaData = (new LetterMetaDataAttributes())
+            ->setLetterMetaDataRecipient($recipientMetaData)
+            ->setLetterMetaDataSender($senderMetaData);
+
         $endpoint->create((new LetterCreateAttributes())
             ->setFileOriginalName('lorem.pdf')
             ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
             ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
             ->setAddressPosition('left')
-            ->setAutoSend(false));
+            ->setAutoSend(false)
+            ->setMetaData($metaData));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {
@@ -214,6 +239,25 @@ class LetterEndpointTest extends EndpointTest
         );
 
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCreateValidation(): void
+    {
+        $organisationId = 'orgId';
+
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        try {
+            $endpoint->create((new LetterCreateAttributes())
+                ->setFileOriginalName('lorem.pdf')
+                ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+                ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+                ->setAddressPosition('left')
+                ->setAutoSend(true));
+        } catch (ValidationException $e) {
+            $this->assertEquals('["When auto_send is set to true delivery_product field is required.","When auto_send is set to true print_mode field is required.","When auto_send is set to true print_spectrum field is required."]', $e->getMessage());
+        }
     }
 
     public function testCreateAndUpload(): void

@@ -16,6 +16,7 @@ use Pingen\Endpoints\DataTransferObjects\Letter\LetterSendAttributes;
 use Pingen\Endpoints\ParameterBags\LetterCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\LetterParameterBag;
 use Pingen\Exceptions\RateLimitJsonApiException;
+use Pingen\Exceptions\ValidationException;
 use Pingen\ResourceEndpoint;
 use Pingen\Support\HasOrganisationContext;
 
@@ -93,9 +94,12 @@ class LettersEndpoint extends ResourceEndpoint
      * @param resource|string $file File content as string, or resource
      * @return LetterDetails
      * @throws RequestException
+     * @throws ValidationException
      */
     public function uploadAndCreate(LetterCreateAttributes $letterCreateAttributes, $file): LetterDetails
     {
+        $letterCreateAttributes->validate(['file_url', 'file_url_signature']);
+
         $fileUploadEndpoint = $this->getFileUploadEndpoint();
         if ($this->isUsingStaging()) {
             $fileUploadEndpoint->useStaging();
@@ -115,9 +119,12 @@ class LettersEndpoint extends ResourceEndpoint
      * @param LetterCreateAttributes $letterCreateAttributes
      * @return LetterDetails
      * @throws RequestException
+     * @throws ValidationException
      */
     public function create(LetterCreateAttributes $letterCreateAttributes): LetterDetails
     {
+        $letterCreateAttributes->validate();
+
         return new LetterDetails(
             $this->performPostRequest(
                 sprintf('/organisations/%s/letters/', $this->getOrganisationId()),
@@ -131,9 +138,12 @@ class LettersEndpoint extends ResourceEndpoint
      * @param LetterPriceCalculationAttributes $letterPriceCalculationAttributes
      * @return LetterPrice
      * @throws RequestException
+     * @throws ValidationException
      */
     public function calculatePrice(LetterPriceCalculationAttributes $letterPriceCalculationAttributes): LetterPrice
     {
+        $letterPriceCalculationAttributes->validate();
+
         return new LetterPrice(
             $this->performPostRequest(
                 sprintf('/organisations/%s/letters/price-calculator', $this->getOrganisationId()),
@@ -149,9 +159,12 @@ class LettersEndpoint extends ResourceEndpoint
      * @return LetterDetails
      * @throws RateLimitJsonApiException
      * @throws RequestException
+     * @throws ValidationException
      */
     public function send(string $letterId, LetterSendAttributes $letterSendAttributes): LetterDetails
     {
+        $letterSendAttributes->validate();
+
         return new LetterDetails(
             $this->performPatchRequest(
                 sprintf('/organisations/%s/letters/%s/send', $this->getOrganisationId(), $letterId),
@@ -168,9 +181,12 @@ class LettersEndpoint extends ResourceEndpoint
      * @return LetterDetails
      * @throws RateLimitJsonApiException
      * @throws RequestException
+     * @throws ValidationException
      */
     public function edit(string $letterId, LetterEditAttributes $letterEditAttributes): LetterDetails
     {
+        $letterEditAttributes->validate();
+
         return new LetterDetails(
             $this->performPatchRequest(
                 sprintf('/organisations/%s/letters/%s', $this->getOrganisationId(), $letterId),
