@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Pingen\Endpoints;
 
 use Illuminate\Http\Client\RequestException;
+use Pingen\Endpoints\DataTransferObjects\Letter\AddAttachmentToMultipleLettersAttributes;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterAddAttachmentAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollection;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollectionItem;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
@@ -247,6 +249,44 @@ class LettersEndpoint extends ResourceEndpoint
         rewind($tmpFile);
 
         return $tmpFile;
+    }
+
+    /**
+     * @param string $letterId
+     * @param LetterAddAttachmentAttributes $letterAddAttachmentAttributes
+     * @throws RateLimitJsonApiException
+     * @throws RequestException
+     */
+    public function addAttachment(string $letterId, LetterAddAttachmentAttributes $letterAddAttachmentAttributes): void
+    {
+        $this->performPatchRequest(
+            sprintf('/organisations/%s/letters/%s/attachment', $this->getOrganisationId(), $letterId),
+            'letters',
+            $letterId,
+            $letterAddAttachmentAttributes
+        );
+    }
+
+    /**
+     * @param AddAttachmentToMultipleLettersAttributes $addAttachmentToMultipleLettersAttributes
+     * @return void
+     * @throws RateLimitJsonApiException
+     * @throws RequestException
+     */
+    public function addAttachmentToMultipleLetters(AddAttachmentToMultipleLettersAttributes $addAttachmentToMultipleLettersAttributes): void
+    {
+        $this->setOnErrorCallbackForJsonApiResponses(
+            $this->getAuthenticatedJsonApiRequest()
+                ->patch(
+                    $this->getResourceBaseUrl() . sprintf('/organisations/%s/letters/attachment', $this->getOrganisationId()),
+                    [
+                        'data' => [
+                            'type' => 'letters_attachment',
+                            'attributes' => $addAttachmentToMultipleLettersAttributes->toArray(),
+                        ],
+                    ]
+                )
+        );
     }
 
     protected function getFileUploadEndpoint(): FileUploadEndpoint

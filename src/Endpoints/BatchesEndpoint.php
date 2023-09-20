@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pingen\Endpoints;
 
 use Illuminate\Http\Client\RequestException;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchAddAttachmentAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchCollection;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchCollectionItem;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchCreateAttributes;
@@ -215,6 +216,21 @@ class BatchesEndpoint extends ResourceEndpoint
                 sprintf('/organisations/%s/batches/%s/statistics', $this->getOrganisationId(), $batchId),
                 $parameterBag ?? (new BatchParameterBag())
             )->json()
+        );
+    }
+
+    /**
+     * @param string $batchId
+     * @param BatchAddAttachmentAttributes $batchAddAttachmentAttributes
+     * @throws JsonApiException
+     */
+    public function addAttachment(string $batchId, BatchAddAttachmentAttributes $batchAddAttachmentAttributes): void
+    {
+        $this->performPatchRequest(
+            sprintf('/organisations/%s/batches/%s/attachment', $this->getOrganisationId(), $batchId),
+            'batches',
+            $batchId,
+            $batchAddAttachmentAttributes
         );
     }
 

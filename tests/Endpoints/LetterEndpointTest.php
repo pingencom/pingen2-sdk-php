@@ -10,6 +10,8 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Response;
 use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadAttributes;
 use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetailsData;
+use Pingen\Endpoints\DataTransferObjects\Letter\AddAttachmentToMultipleLettersAttributes;
+use Pingen\Endpoints\DataTransferObjects\Letter\LetterAddAttachmentAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterDetailsData;
@@ -626,5 +628,63 @@ class LetterEndpointTest extends EndpointTest
                 );
             }
         );
+    }
+
+    public function testAddAttachment(): void
+    {
+        $letterId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push([], Response::HTTP_ACCEPTED);
+
+        $endpoint->addAttachment($letterId, (new LetterAddAttachmentAttributes())
+            ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+            ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+        );
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $letterId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/%s/attachment', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testAddAttachmentToMultipleLetters(): void
+    {
+        $letterIdA = 'exampleIdA';
+        $letterIdB = 'exampleIdB';
+        $organisationId = 'orgId';
+
+        $endpoint = (new LettersEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push([], Response::HTTP_ACCEPTED);
+
+        $endpoint->addAttachmentToMultipleLetters((new AddAttachmentToMultipleLettersAttributes())
+            ->setLetterIds([$letterIdA, $letterIdB])
+            ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+            ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+        );
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/letters/attachment', $endpoint->getResourceBaseUrl(), $organisationId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
     }
 }

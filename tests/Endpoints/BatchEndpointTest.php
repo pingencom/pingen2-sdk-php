@@ -9,6 +9,7 @@ use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Response;
 use Pingen\Endpoints\BatchesEndpoint;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchAddAttachmentAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchDetailsData;
@@ -523,6 +524,34 @@ class BatchEndpointTest extends EndpointTest
             function (Request $request) use ($endpoint, $batchId, $organisationId): void {
                 $this->assertEquals(
                     sprintf('%s/organisations/%s/batches/%s/statistics', $endpoint->getResourceBaseUrl(), $organisationId, $batchId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testAddAttachment(): void
+    {
+        $batchId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push([], Response::HTTP_ACCEPTED);
+
+        $endpoint->addAttachment($batchId, (new BatchAddAttachmentAttributes())
+            ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+            ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+        );
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $batchId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/batches/%s/attachment', $endpoint->getResourceBaseUrl(), $organisationId, $batchId),
                     $request->url()
                 );
             }
