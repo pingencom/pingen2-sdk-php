@@ -9,7 +9,7 @@ If you are looking for the SDK for pingen v1, please visit this repository: http
 
 You need to have an account in pingen v2 and obtain oauth credentials for your desired grant type (usually client_credentials).
 
-How to obtain these are described here: https://api.v2.pingen.com/documentation#section/Authentication/How-to-obtain-a-Client-ID
+How to obtain these are described here: https://api.pingen.com/documentation#section/Authentication/How-to-obtain-a-Client-ID
 
 # Installation
 
@@ -19,13 +19,13 @@ Require the package via composer (Get composer here: https://getcomposer.org/dow
 
 # Environments
 
-We have two Environments available: Production and Staging (see https://api.v2.pingen.com/documentation#section/Basics/Environments)
+We have two Environments available: Production and Staging (see https://api.pingen.com/documentation#section/Basics/Environments)
 
 This SDK supports staging as well. **When initiating the provider** (see Usage), the optional 'staging' attribute should be set, **as well as when creating an endpoint object**.
 
 # Usage
 
-The simplest way to integrate is using the client credentials grant (see https://api.v2.pingen.com/documentation#section/Authentication/Which-grant-type-should-i-use)
+The simplest way to integrate is using the client credentials grant (see https://api.pingen.com/documentation#section/Authentication/Which-grant-type-should-i-use)
 
 ```php
 require __DIR__ . '/vendor/autoload.php';
@@ -55,7 +55,7 @@ $lettersEndpoint->uploadAndCreate(
 
 # Examples & Docs
 
-Our API Docs are here: https://api.v2.pingen.com/documentation
+Our API Docs are here: https://api.pingen.com/documentation
 
 On the right-hand side of every endpoint you can see request samples for PHP and other languages, which you can copy and paste into your application.
 
