@@ -1,10 +1,3 @@
-# Important information
-
-This SDK uses the new API V2 of pingen v2. Pingen v2 does not share any data with v1 and therefore separate accounts
-are required.
-
-If you are looking for the SDK for pingen v1, please visit this repository: https://github.com/pingencom/pingen
-
 # Requirements
 
 You need to have an account in pingen v2 and obtain oauth credentials for your desired grant type (usually client_credentials).
