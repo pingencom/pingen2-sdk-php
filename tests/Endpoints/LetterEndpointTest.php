@@ -16,9 +16,6 @@ use Pingen\Endpoints\DataTransferObjects\Letter\LetterAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterDetailsData;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterEditAttributes;
-use Pingen\Endpoints\DataTransferObjects\Letter\LetterMetaDataAttributes;
-use Pingen\Endpoints\DataTransferObjects\Letter\LetterMetaDataRecipientAttributes;
-use Pingen\Endpoints\DataTransferObjects\Letter\LetterMetaDataSenderAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceCalculationAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterPriceData;
@@ -203,33 +200,30 @@ class LetterEndpointTest extends EndpointTest
                     ])
                 ]),Response::HTTP_CREATED);
 
-        $recipientMetaData = (new LetterMetaDataRecipientAttributes())
-            ->setName('Jonh')
-            ->setCountry('CH')
-            ->setCity('Zurich')
-            ->setStreet('Example')
-            ->setNumber('666')
-            ->setZip('8005');
-
-        $senderMetaData = (new LetterMetaDataSenderAttributes())
-            ->setName('Jonh')
-            ->setCountry('CH')
-            ->setCity('Zurich')
-            ->setStreet('Example')
-            ->setNumber('666')
-            ->setZip('8005');
-
-        $metaData = (new LetterMetaDataAttributes())
-            ->setLetterMetaDataRecipient($recipientMetaData)
-            ->setLetterMetaDataSender($senderMetaData);
-
         $endpoint->create((new LetterCreateAttributes())
             ->setFileOriginalName('lorem.pdf')
             ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
             ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
             ->setAddressPosition('left')
             ->setAutoSend(false)
-            ->setMetaData($metaData));
+            ->setMetaData([
+                'recipient' => [
+                    'name' => 'R_Example',
+                    'street' => 'R_Street',
+                    'number' => 'R_12 ',
+                    'zip' => 'R_12',
+                    'city' => 'R_Warsaw',
+                    'country' => 'PL'
+                ],
+                'sender' => [
+                    'name' => 'S_Example',
+                    'street' => 'S_Street',
+                    'number' => 'S_12 ',
+                    'zip' => 'S_12',
+                    'city' => 'S_Warsaw',
+                    'country' => 'PL'
+                ]
+            ]));
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {
