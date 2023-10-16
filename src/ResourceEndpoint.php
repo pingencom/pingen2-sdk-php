@@ -31,9 +31,9 @@ abstract class ResourceEndpoint
 
     protected HttpClient $httpClient;
 
-    protected string $resourceBaseUrlProduction = 'https://api.v2.pingen.com';
+    protected string $resourceBaseUrlProduction = 'https://api.pingen.com';
 
-    protected string $resourceBaseUrlStaging = 'https://api-staging.v2.pingen.com';
+    protected string $resourceBaseUrlStaging = 'https://api-staging.pingen.com';
 
     protected bool $useStaging = false;
 
