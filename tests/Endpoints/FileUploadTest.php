@@ -13,7 +13,7 @@ use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetailsData;
 use Pingen\Endpoints\FileUploadEndpoint;
 use Pingen\Endpoints\ParameterBags\FileUploadParameterBag;
 
-class FileUploadTest extends EndpointTest
+class FileUploadTest extends EndpointTestBase
 {
     public function testRequestFileUpload(): void
     {

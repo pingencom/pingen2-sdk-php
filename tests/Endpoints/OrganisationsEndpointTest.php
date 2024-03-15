@@ -8,7 +8,7 @@ use Pingen\Endpoints\DataTransferObjects\Organisation\OrganisationAttributes;
 use Pingen\Endpoints\OrganisationsEndpoint;
 use Pingen\Endpoints\ParameterBags\OrganisationParameterBag;
 
-class OrganisationsEndpointTest extends EndpointTest
+class OrganisationsEndpointTest extends EndpointTestBase
 {
     public function testGetDetails(): void
     {

@@ -13,7 +13,7 @@ use Pingen\Endpoints\ParameterBags\LetterIssuesCollectionParameterBag;
  * Class LetterIssuesEndpointTest
  * @package Tests
  */
-class LetterIssuesEndpointTest extends EndpointTest
+class LetterIssuesEndpointTest extends EndpointTestBase
 {
     public function testGetCollection(): void
     {
