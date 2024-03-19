@@ -30,7 +30,7 @@ use Pingen\Exceptions\JsonApiExceptionErrorSource;
 use Pingen\Exceptions\RateLimitJsonApiException;
 use Pingen\Exceptions\ValidationException;
 
-class LetterEndpointTest extends EndpointTest
+class LetterEndpointTest extends EndpointTestBase
 {
     public function testGetLetterCollection(): void
     {

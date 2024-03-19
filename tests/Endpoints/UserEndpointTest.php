@@ -8,7 +8,7 @@ use Pingen\Endpoints\DataTransferObjects\User\UserAttributes;
 use Pingen\Endpoints\ParameterBags\UserParameterBag;
 use Pingen\Endpoints\UserEndpoint;
 
-class UserEndpointTest extends EndpointTest
+class UserEndpointTest extends EndpointTestBase
 {
     public function testGetDetails(): void
     {

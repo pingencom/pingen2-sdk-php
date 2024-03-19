@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 use Pingen\Endpoints\BatchEventsEndpoint;
 use Pingen\Endpoints\ParameterBags\BatchEventCollectionParameterBag;
 
-class BatchEventsEndpointTest extends EndpointTest
+class BatchEventsEndpointTest extends EndpointTestBase
 {
     public function testGetCollection(): void
     {

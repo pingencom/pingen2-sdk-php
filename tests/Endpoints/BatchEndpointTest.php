@@ -27,7 +27,7 @@ use Pingen\Exceptions\JsonApiExceptionError;
 use Pingen\Exceptions\JsonApiExceptionErrorSource;
 use Pingen\Exceptions\ValidationException;
 
-class BatchEndpointTest extends EndpointTest
+class BatchEndpointTest extends EndpointTestBase
 {
     public function testGetBatchCollection(): void
     {

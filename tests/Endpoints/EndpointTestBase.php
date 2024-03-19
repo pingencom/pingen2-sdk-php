@@ -8,10 +8,10 @@ use League\OAuth2\Client\Token\AccessToken;
 use Tests\TestCase;
 
 /**
- * Class EndpointTest
+ * Class EndpointTestBase
  * @package Tests\Endpoints
  */
-abstract class EndpointTest extends TestCase
+abstract class EndpointTestBase extends TestCase
 {
     protected function getAccessToken(): AccessToken
     {

@@ -19,7 +19,7 @@ use Pingen\Endpoints\UserAssociationsEndpoint;
 use Pingen\Exceptions\JsonApiExceptionError;
 use Pingen\Exceptions\JsonApiExceptionErrorSource;
 
-class UserAssociationsEndpointTest extends EndpointTest
+class UserAssociationsEndpointTest extends EndpointTestBase
 {
     public function testGetCollection(): void
     {

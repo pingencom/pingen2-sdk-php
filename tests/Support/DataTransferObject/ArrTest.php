@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Support\DataTransferObject;
 
-use Illuminate\Support\Carbon;
+use Carbon\CarbonImmutable;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterAttributes;
 use Pingen\Support\DataTransferObject\DataTransferObject;
 use Tests\TestCase;
@@ -31,8 +31,8 @@ class ArrTest extends TestCase
                 'is_embedded' => true
             ]],
             'tracking_number' => '98.1234.11',
-            'created_at' => Carbon::make('2020-11-19T09:42:48+0100'),
-            'updated_at' => Carbon::make('2020-11-19T09:42:48+0100')
+            'created_at' => CarbonImmutable::make('2020-11-19T09:42:48+0100'),
+            'updated_at' => CarbonImmutable::make('2020-11-19T09:42:48+0100')
         ];
 
         $letterDTO = new LetterAttributes($expectedArray);

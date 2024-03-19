@@ -15,7 +15,7 @@ use Pingen\Endpoints\WebhooksEndpoint;
 use Pingen\Exceptions\JsonApiExceptionError;
 use Pingen\Exceptions\JsonApiExceptionErrorSource;
 
-class WebhookEndpointTest extends EndpointTest
+class WebhookEndpointTest extends EndpointTestBase
 {
     public function testGetWebhookCollection(): void
     {
