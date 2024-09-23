@@ -58,8 +58,8 @@ class FileUploadEndpoint extends ResourceEndpoint
             case is_resource($file):
                 stream_copy_to_stream($file, $tmpFile);
                 break;
-            case is_file($file):
-                $tmp = fopen($file, 'r');
+            case is_file($file): // @phpstan-ignore-line
+                $tmp = fopen($file, 'r'); // // @phpstan-ignore-line
                 if (! is_resource($tmp)) {
                     throw new RuntimeException('Cannot open file with given path: ' . $tmpFile); // @codeCoverageIgnore
                 }

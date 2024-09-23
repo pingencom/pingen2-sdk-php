@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Pingen\Endpoints\DataTransferObjects\BatchEvent;
 
-use Pingen\Endpoints\DataTransferObjects\Batch\BatchIncluded;
 use Pingen\Endpoints\DataTransferObjects\General\CollectionLinks;
 use Pingen\Endpoints\DataTransferObjects\General\CollectionMeta;
 use Pingen\Support\DataTransferObject\DataTransferObject;
@@ -12,7 +11,7 @@ use Pingen\Support\DataTransferObject\DataTransferObject;
 class BatchEventCollection extends DataTransferObject
 {
     /**
-     * @var BatchEventCollectionItem[]
+     * @var \Pingen\Endpoints\DataTransferObjects\BatchEvent\BatchEventCollectionItem[]
      */
     public array $data;
 
@@ -21,7 +20,7 @@ class BatchEventCollection extends DataTransferObject
     public CollectionMeta $meta;
 
     /**
-     * @var BatchIncluded[]|null
+     * @var \Pingen\Endpoints\DataTransferObjects\Batch\BatchIncluded[]|null
      */
     public ?array $included;
 }
