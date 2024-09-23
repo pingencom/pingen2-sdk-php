@@ -12,7 +12,7 @@ use Pingen\Support\DataTransferObject\DataTransferObject;
 class BatchCollection extends DataTransferObject
 {
     /**
-     * @var BatchCollectionItem[]
+     * @var \Pingen\Endpoints\DataTransferObjects\Batch\BatchCollectionItem[]
      */
     public array $data;
 
@@ -21,7 +21,7 @@ class BatchCollection extends DataTransferObject
     public CollectionMeta $meta;
 
     /**
-     * @var OrganisationIncluded[]|null
+     * @var \Pingen\Endpoints\DataTransferObjects\Organisation\OrganisationIncluded[]|null
      */
     public ?array $included;
 }
