@@ -6,7 +6,6 @@ namespace Pingen\Endpoints\DataTransferObjects\Batch;
 
 use Pingen\Endpoints\DataTransferObjects\General\CollectionLinks;
 use Pingen\Endpoints\DataTransferObjects\General\CollectionMeta;
-use Pingen\Endpoints\DataTransferObjects\Organisation\OrganisationIncluded;
 use Pingen\Support\DataTransferObject\DataTransferObject;
 
 class BatchCollection extends DataTransferObject
