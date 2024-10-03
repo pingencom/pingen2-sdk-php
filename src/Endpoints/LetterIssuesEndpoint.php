@@ -29,7 +29,7 @@ class LetterIssuesEndpoint extends ResourceEndpoint
         return new LetterEventCollection(
             $this
                 ->performGetCollectionRequest(
-                    sprintf('/organisations/%s/letters/issues', $this->getOrganisationId()),
+                    sprintf('/organisations/%s/letters/events/issues', $this->getOrganisationId()),
                     $letterIssuesCollectionParameterBag ?? (new LetterIssuesCollectionParameterBag())
                 )->json()
         );
