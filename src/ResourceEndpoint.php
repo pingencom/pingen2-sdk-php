@@ -218,11 +218,11 @@ abstract class ResourceEndpoint
      * @param string $endpoint
      * @param string $type
      * @param string $id
-     * @param Input $body
+     * @param Input|null $body
      * @return Response
      * @throws JsonApiException
      */
-    protected function performPatchRequest(string $endpoint, string $type, string $id, Input $body = null)
+    protected function performPatchRequest(string $endpoint, string $type, string $id, ?Input $body = null): Response
     {
         $data = [];
 
