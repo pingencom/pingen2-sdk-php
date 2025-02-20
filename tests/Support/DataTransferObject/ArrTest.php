@@ -30,7 +30,9 @@ class ArrTest extends TestCase
                 'name' => 'Helvetica',
                 'is_embedded' => true
             ]],
+            'source' => 'API',
             'tracking_number' => '98.1234.11',
+            'submitted_at' => CarbonImmutable::make('2020-11-19T09:42:48+0100'),
             'created_at' => CarbonImmutable::make('2020-11-19T09:42:48+0100'),
             'updated_at' => CarbonImmutable::make('2020-11-19T09:42:48+0100')
         ];
@@ -48,8 +50,11 @@ class ArrTest extends TestCase
             'price_value' => 1.25,
             'delivery_product' => 'fast',
             'print_mode' => 'simplex',
-            'print_spectrum' => 'color'
-        ], $letterDTO->except('file_original_name', 'file_pages', 'address_position', 'address', 'country', 'created_at', 'updated_at')->toArray());
+            'print_spectrum' => 'color',
+            'paper_types' => ['normal', 'qr'],
+            'source' => 'API',
+            'tracking_number' => '98.1234.11',
+        ], $letterDTO->except('file_original_name', 'fonts', 'file_pages', 'address_position', 'address', 'country', 'submitted_at', 'created_at', 'updated_at')->toArray());
     }
 
     public function testForget(): void
