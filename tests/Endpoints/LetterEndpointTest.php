@@ -90,6 +90,7 @@ class LetterEndpointTest extends EndpointTestBase
                                 'name' => 'Helvetica',
                                 'is_embedded' => true
                             ]],
+                            'source' => 'API',
                             'tracking_number' => '98.1234.11',
                             'submitted_at' => '2021-11-19T09:42:48+0100',
                             'created_at' => '2020-11-19T09:42:48+0100',
