@@ -38,6 +38,16 @@ class LetterAttributes extends DataTransferObject
 
     public ?string $print_spectrum;
 
+    public ?array $paper_types;
+
+    public ?array $fonts;
+
+    public ?string $source;
+
+    public ?string $tracking_number;
+
+    public ?CarbonImmutable $submitted_at;
+
     public CarbonImmutable $created_at;
 
     public CarbonImmutable $updated_at;
