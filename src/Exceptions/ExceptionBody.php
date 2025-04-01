@@ -13,7 +13,7 @@ use Pingen\Support\DataTransferObject\DataTransferObject;
 class ExceptionBody extends DataTransferObject
 {
     /**
-     * @var \Pingen\Exceptions\JsonApiExceptionError[];
+     * @var \Pingen\Exceptions\JsonApiExceptionError[]
      */
     public array $errors;
 }
