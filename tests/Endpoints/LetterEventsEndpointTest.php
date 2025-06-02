@@ -166,7 +166,7 @@ class LetterEventsEndpointTest extends EndpointTestBase
                 Response::HTTP_OK,
             );
 
-        $endpoint->getUndeliverableCollection($listParameterBag);
+        $endpoint->getDeliveredCollection($listParameterBag);
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
