@@ -98,7 +98,7 @@ REGEXP;
                 if (strpos($type, '>') !== false) {
                     preg_match('/([\w\\\\]+)(>)/', $type, $matches);
 
-                    return $matches[1]; // @phpstan-ignore-line
+                    return $matches[1];
                 }
 
                 return null;
