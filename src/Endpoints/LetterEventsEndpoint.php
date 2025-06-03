@@ -87,4 +87,21 @@ class LetterEventsEndpoint extends ResourceEndpoint
                 )->json()
         );
     }
+
+    /**
+     * @param LetterEventCollectionParameterBag|null $letterEventCollectionParameterBag
+     * @return LetterEventCollection
+     * @throws RateLimitJsonApiException
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function getDeliveredCollection(?LetterEventCollectionParameterBag $letterEventCollectionParameterBag = null): LetterEventCollection
+    {
+        return new LetterEventCollection(
+            $this
+                ->performGetCollectionRequest(
+                    sprintf('/organisations/%s/letters/events/delivered', $this->getOrganisationId()),
+                    $letterEventCollectionParameterBag ?? (new LetterEventCollectionParameterBag())
+                )->json()
+        );
+    }
 }
