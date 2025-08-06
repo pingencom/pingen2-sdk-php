@@ -7,13 +7,13 @@ namespace Pingen\Endpoints\DataTransferObjects\Batch;
 use Pingen\Support\Input;
 
 /**
- * @method BatchSendAttributes setDeliveryProduct(array $value)
+ * @method BatchSendAttributes setDeliveryProducts(array $value)
  * @method BatchSendAttributes setPrintMode(string $value)
  * @method BatchSendAttributes setPrintSpectrum(string $value)
  */
 class BatchSendAttributes extends Input
 {
-    protected array $delivery_product;
+    protected array $delivery_products;
 
     protected string $print_mode;
 
