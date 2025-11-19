@@ -57,7 +57,7 @@ abstract class Input implements Arrayable
             ->each(function ($property) use (&$data): void {
                 $propertyValue = $this->{$property};
 
-                if ($this->{$property} instanceof Input) {
+                if ($this->{$property} instanceof self) {
                     $propertyValue = $this->{$property}->toArray();
                 }
 

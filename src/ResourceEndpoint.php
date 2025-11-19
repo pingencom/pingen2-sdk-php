@@ -194,7 +194,7 @@ abstract class ResourceEndpoint
                         'data' => [
                             'type' => $type,
                             'attributes' => $body->toArray(),
-                            'relationships' => $relationships
+                            'relationships' => $relationships,
                         ],
                     ]
                 )
