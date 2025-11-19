@@ -179,11 +179,12 @@ abstract class ResourceEndpoint
      * @param string $endpoint
      * @param string $type
      * @param Input $body
+     * @param array $relationships
      * @return Response
      * @throws \Illuminate\Http\Client\RequestException
      * @throws RateLimitJsonApiException
      */
-    protected function performPostRequest(string $endpoint, string $type, Input $body)
+    protected function performPostRequest(string $endpoint, string $type, Input $body, array $relationships = [])
     {
         return $this->setOnErrorCallbackForJsonApiResponses(
             $this->getAuthenticatedJsonApiRequest()
@@ -193,6 +194,7 @@ abstract class ResourceEndpoint
                         'data' => [
                             'type' => $type,
                             'attributes' => $body->toArray(),
+                            'relationships' => $relationships
                         ],
                     ]
                 )
