@@ -78,6 +78,7 @@ class EBillEndpointTest extends EndpointTestBase
                             'price_currency' => 'CHF',
                             'price_value' => 1.25,
                             'source' => 'api',
+                            'submitted_at' => '2025-10-19T19:42:48+0100',
                             'created_at' => '2025-10-19T09:42:48+0100',
                             'updated_at' => '2025-10-19T09:42:48+0100'
                         ])
@@ -182,6 +183,7 @@ class EBillEndpointTest extends EndpointTestBase
                             'invoice_value' => null,
                             'invoice_currency' => null,
                             'source' => 'api',
+                            'submitted_at' => null,
                             'created_at' => '2025-10-19T09:42:48+0100',
                             'updated_at' => '2025-10-19T09:42:48+0100'
                         ])
@@ -257,6 +259,7 @@ class EBillEndpointTest extends EndpointTestBase
                             'invoice_value' => null,
                             'invoice_currency' => null,
                             'source' => 'api',
+                            'submitted_at' => null,
                             'created_at' => '2025-10-19T09:42:48+0100',
                             'updated_at' => '2025-10-19T09:42:48+0100'
                         ])

@@ -42,6 +42,8 @@ class EBillAttributes extends DataTransferObject
 
     public ?string $source;
 
+    public ?CarbonImmutable $submitted_at;
+
     public CarbonImmutable $created_at;
 
     public CarbonImmutable $updated_at;
