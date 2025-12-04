@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Pingen\Endpoints;
 
 use Illuminate\Http\Client\RequestException;
-use Pingen\Endpoints\DataTransferObjects\Deliveries\EBill\EBillCollection;
-use Pingen\Endpoints\DataTransferObjects\Deliveries\EBill\EBillCollectionItem;
-use Pingen\Endpoints\DataTransferObjects\Deliveries\EBill\EBillCreateAttributes;
-use Pingen\Endpoints\DataTransferObjects\Deliveries\EBill\EBillDetails;
-use Pingen\Endpoints\ParameterBags\EBillCollectionParameterBag;
-use Pingen\Endpoints\ParameterBags\EBillParameterBag;
+use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillCollection;
+use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillCollectionItem;
+use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillCreateAttributes;
+use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillDetails;
+use Pingen\Endpoints\ParameterBags\EbillCollectionParameterBag;
+use Pingen\Endpoints\ParameterBags\EbillParameterBag;
 use Pingen\Exceptions\RateLimitJsonApiException;
 use Pingen\Exceptions\ValidationException;
 use Pingen\ResourceEndpoint;
@@ -19,52 +19,52 @@ use Pingen\Support\HasOrganisationContext;
 /**
  * @package Pingen\Endpoints
  */
-class EBillEndpoint extends ResourceEndpoint
+class EbillEndpoint extends ResourceEndpoint
 {
     use HasOrganisationContext;
 
     /**
      * @param string $ebillId
-     * @param ?EBillParameterBag $parameterBag
-     * @return EBillDetails
+     * @param ?EbillParameterBag $parameterBag
+     * @return EbillDetails
      * @throws RequestException
      */
-    public function getDetails(string $ebillId, ?EBillParameterBag $parameterBag = null): EBillDetails
+    public function getDetails(string $ebillId, ?EbillParameterBag $parameterBag = null): EbillDetails
     {
-        return new EBillDetails(
+        return new EbillDetails(
             $this->performGetDetailsRequest(
                 sprintf('/organisations/%s/deliveries/ebills/%s', $this->getOrganisationId(), $ebillId),
-                $parameterBag ?? new EBillParameterBag()
+                $parameterBag ?? new EbillParameterBag()
             )->json()
         );
     }
 
     /**
-     * @param ?EBillCollectionParameterBag $ebillCollectionParameterBag
-     * @return EBillCollection
+     * @param ?EbillCollectionParameterBag $ebillCollectionParameterBag
+     * @return EbillCollection
      * @throws RateLimitJsonApiException
      * @throws RequestException
      */
-    public function getCollection(?EBillCollectionParameterBag $ebillCollectionParameterBag = null): EBillCollection
+    public function getCollection(?EbillCollectionParameterBag $ebillCollectionParameterBag = null): EbillCollection
     {
-        return new EBillCollection(
+        return new EbillCollection(
             $this
                 ->performGetCollectionRequest(
                     sprintf('/organisations/%s/deliveries/ebills/', $this->getOrganisationId()),
-                    $ebillCollectionParameterBag ?? (new EBillCollectionParameterBag())
+                    $ebillCollectionParameterBag ?? (new EbillCollectionParameterBag())
                 )->json()
         );
     }
 
     /**
-     * @param ?EBillCollectionParameterBag $listParameterBag
-     * @return \Generator|EBillCollectionItem[]
+     * @param ?EbillCollectionParameterBag $listParameterBag
+     * @return \Generator|EbillCollectionItem[]
      * @throws RequestException
      */
-    public function iterateOverCollection(?EBillCollectionParameterBag $listParameterBag = null)
+    public function iterateOverCollection(?EbillCollectionParameterBag $listParameterBag = null)
     {
         if ($listParameterBag === null) {
-            $listParameterBag = new EBillCollectionParameterBag();
+            $listParameterBag = new EbillCollectionParameterBag();
         }
 
         try {
@@ -85,14 +85,14 @@ class EBillEndpoint extends ResourceEndpoint
     }
 
     /**
-     * @param EBillCreateAttributes $ebillCreateAttributes
+     * @param EbillCreateAttributes $ebillCreateAttributes
      * @param resource|string $file File content as string, or resource
      * @param array $relationshipPreset
-     * @return EBillDetails
+     * @return EbillDetails
      * @throws RequestException
      * @throws ValidationException
      */
-    public function uploadAndCreate(EBillCreateAttributes $ebillCreateAttributes, $file, array $relationshipPreset = []): EBillDetails
+    public function uploadAndCreate(EbillCreateAttributes $ebillCreateAttributes, $file, array $relationshipPreset = []): EbillDetails
     {
         $ebillCreateAttributes->validate(['file_url', 'file_url_signature']);
 
@@ -112,17 +112,17 @@ class EBillEndpoint extends ResourceEndpoint
     }
 
     /**
-     * @param EBillCreateAttributes $ebillCreateAttributes
+     * @param EbillCreateAttributes $ebillCreateAttributes
      * @param array $relationshipPreset
-     * @return EBillDetails
+     * @return EbillDetails
      * @throws RequestException
      * @throws ValidationException
      */
-    public function create(EBillCreateAttributes $ebillCreateAttributes, array $relationshipPreset = []): EBillDetails
+    public function create(EbillCreateAttributes $ebillCreateAttributes, array $relationshipPreset = []): EbillDetails
     {
         $ebillCreateAttributes->validate();
 
-        return new EBillDetails(
+        return new EbillDetails(
             $this->performPostRequest(
                 sprintf('/organisations/%s/deliveries/ebills/', $this->getOrganisationId()),
                 'ebills',

@@ -9,11 +9,11 @@ use Pingen\Support\CollectionParameterBag;
 /**
  * @package Pingen\Endpoints\ParameterBags
  */
-class EBillCollectionParameterBag extends CollectionParameterBag
+class EbillCollectionParameterBag extends CollectionParameterBag
 {
     /**
      * @param array $fields
-     * @return EBillCollectionParameterBag
+     * @return EbillCollectionParameterBag
      */
     public function setFieldsEBill(array $fields): self
     {

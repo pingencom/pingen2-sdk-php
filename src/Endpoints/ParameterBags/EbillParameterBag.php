@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 /**
  * @package Pingen\Endpoints\ParameterBags
  */
-class EBillParameterBag extends ParameterBag
+class EbillParameterBag extends ParameterBag
 {
     /**
      * @param array $fields

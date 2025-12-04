@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Pingen\Endpoints\DataTransferObjects\Deliveries\EBill;
+namespace Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill;
 
 use Carbon\CarbonImmutable;
 use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
- * @package Pingen\DataTransferObjects\Deliveries\EBill
+ * @package Pingen\DataTransferObjects\Deliveries\Ebill
  */
-class EBillAttributes extends DataTransferObject
+class EbillAttributes extends DataTransferObject
 {
     public string $status;
 
