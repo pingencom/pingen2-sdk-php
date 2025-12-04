@@ -261,7 +261,7 @@ abstract class ResourceEndpoint
     protected function performPutFileRequest(string $url, $tmpFile): void
     {
         /** @var Response $response */
-        $response =  $this->getHttpClient()
+        $response = $this->getHttpClient()
             ->bodyFormat('none')
             ->withOptions([
                 'body' => $tmpFile,
