@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pingen\Endpoints;
 
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Response;
 use Pingen\Endpoints\DataTransferObjects\Letter\AddAttachmentToMultipleLettersAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterAddAttachmentAttributes;
 use Pingen\Endpoints\DataTransferObjects\Letter\LetterCollection;
@@ -275,18 +276,19 @@ class LettersEndpoint extends ResourceEndpoint
      */
     public function addAttachmentToMultipleLetters(AddAttachmentToMultipleLettersAttributes $addAttachmentToMultipleLettersAttributes): void
     {
-        $this->setOnErrorCallbackForJsonApiResponses(
-            $this->getAuthenticatedJsonApiRequest()
-                ->patch(
-                    $this->getResourceBaseUrl() . sprintf('/organisations/%s/letters/attachment', $this->getOrganisationId()),
-                    [
-                        'data' => [
-                            'type' => 'letters_attachment',
-                            'attributes' => $addAttachmentToMultipleLettersAttributes->toArray(),
-                        ],
-                    ]
-                )
-        );
+        /** @var Response $response */
+        $response = $this->getAuthenticatedJsonApiRequest()
+            ->patch(
+                $this->getResourceBaseUrl() . sprintf('/organisations/%s/letters/attachment', $this->getOrganisationId()),
+                [
+                    'data' => [
+                        'type' => 'letters_attachment',
+                        'attributes' => $addAttachmentToMultipleLettersAttributes->toArray(),
+                    ],
+                ]
+            );
+
+        $this->setOnErrorCallbackForJsonApiResponses($response);
     }
 
     protected function getFileUploadEndpoint(): FileUploadEndpoint

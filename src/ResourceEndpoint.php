@@ -132,13 +132,14 @@ abstract class ResourceEndpoint
         string $endpoint,
         CollectionParameterBag $collectionParameterBag
     ): Response {
-        return $this->setOnErrorCallbackForJsonApiResponses(
-            $this->getAuthenticatedJsonApiRequest()
-                ->get(
-                    $this->getResourceBaseUrl() . $endpoint,
-                    $collectionParameterBag->all()
-                )
-        );
+        /** @var Response $response */
+        $response = $this->getAuthenticatedJsonApiRequest()
+            ->get(
+                $this->getResourceBaseUrl() . $endpoint,
+                $collectionParameterBag->all()
+            );
+
+        return $this->setOnErrorCallbackForJsonApiResponses($response);
     }
 
     /**
@@ -150,13 +151,14 @@ abstract class ResourceEndpoint
      */
     protected function performGetDetailsRequest(string $endpoint, ParameterBag $parameterBag): Response
     {
-        return $this->setOnErrorCallbackForJsonApiResponses(
-            $this->getAuthenticatedJsonApiRequest()
-                ->get(
-                    $this->getResourceBaseUrl() . $endpoint,
-                    $parameterBag->all()
-                )
-        );
+        /** @var Response $response */
+        $response = $this->getAuthenticatedJsonApiRequest()
+            ->get(
+                $this->getResourceBaseUrl() . $endpoint,
+                $parameterBag->all()
+            );
+
+        return $this->setOnErrorCallbackForJsonApiResponses($response);
     }
 
     /**
@@ -167,36 +169,40 @@ abstract class ResourceEndpoint
      */
     protected function performGetRequest(string $endpoint): Response
     {
-        return $this->setOnErrorCallbackForJsonApiResponses(
-            $this->getAuthenticatedJsonApiRequest()
-                ->get(
-                    $this->getResourceBaseUrl() . $endpoint
-                )
-        );
+        /** @var Response $response */
+        $response = $this->getAuthenticatedJsonApiRequest()
+            ->get(
+                $this->getResourceBaseUrl() . $endpoint
+            );
+
+        return $this->setOnErrorCallbackForJsonApiResponses($response);
     }
 
     /**
      * @param string $endpoint
      * @param string $type
      * @param Input $body
+     * @param array $relationships
      * @return Response
      * @throws \Illuminate\Http\Client\RequestException
      * @throws RateLimitJsonApiException
      */
-    protected function performPostRequest(string $endpoint, string $type, Input $body)
+    protected function performPostRequest(string $endpoint, string $type, Input $body, array $relationships = [])
     {
-        return $this->setOnErrorCallbackForJsonApiResponses(
-            $this->getAuthenticatedJsonApiRequest()
-                ->post(
-                    $this->getResourceBaseUrl() . $endpoint,
-                    [
-                        'data' => [
-                            'type' => $type,
-                            'attributes' => $body->toArray(),
-                        ],
-                    ]
-                )
-        );
+        /** @var Response $response */
+        $response = $this->getAuthenticatedJsonApiRequest()
+            ->post(
+                $this->getResourceBaseUrl() . $endpoint,
+                [
+                    'data' => [
+                        'type' => $type,
+                        'attributes' => $body->toArray(),
+                        'relationships' => $relationships,
+                    ],
+                ]
+            );
+
+        return $this->setOnErrorCallbackForJsonApiResponses($response);
     }
 
     /**
@@ -206,12 +212,13 @@ abstract class ResourceEndpoint
      */
     protected function performDeleteRequest(string $endpoint)
     {
-        return $this->setOnErrorCallbackForJsonApiResponses(
-            $this->getAuthenticatedJsonApiRequest()
-                ->delete(
-                    $this->getResourceBaseUrl() . $endpoint
-                )
-        );
+        /** @var Response $response */
+        $response = $this->getAuthenticatedJsonApiRequest()
+            ->delete(
+                $this->getResourceBaseUrl() . $endpoint
+            );
+
+        return $this->setOnErrorCallbackForJsonApiResponses($response);
     }
 
     /**
@@ -235,14 +242,14 @@ abstract class ResourceEndpoint
                 ],
             ];
         }
+        /** @var Response $response */
+        $response = $this->getAuthenticatedJsonApiRequest()
+            ->patch(
+                $this->getResourceBaseUrl() . $endpoint,
+                $data
+            );
 
-        return $this->setOnErrorCallbackForJsonApiResponses(
-            $this->getAuthenticatedJsonApiRequest()
-                ->patch(
-                    $this->getResourceBaseUrl() . $endpoint,
-                    $data
-                )
-        );
+        return $this->setOnErrorCallbackForJsonApiResponses($response);
     }
 
     /**
@@ -253,7 +260,8 @@ abstract class ResourceEndpoint
      */
     protected function performPutFileRequest(string $url, $tmpFile): void
     {
-        $this->getHttpClient()
+        /** @var Response $response */
+        $response = $this->getHttpClient()
             ->bodyFormat('none')
             ->withOptions([
                 'body' => $tmpFile,
@@ -261,8 +269,9 @@ abstract class ResourceEndpoint
                     'Content-Type' => 'application/pdf',
                 ],
             ])
-            ->put($url)
-            ->throw();
+            ->put($url);
+
+        $response->throw();
     }
 
     /**

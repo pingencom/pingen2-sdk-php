@@ -79,7 +79,10 @@ class BatchEndpointTest extends EndpointTestBase
                             'address_position' => 'left',
                             'price_currency' => 'CHF',
                             'price_value' => 1.25,
-                            'delivery_product' => 'fast',
+                            'delivery_products' => [
+                                'country' => 'CH',
+                                'delivery_product' => 'fast'
+                            ],
                             'print_mode' => 'simplex',
                             'print_spectrum' => 'color',
                             'created_at' => '2020-11-19T09:42:48+0100',
@@ -180,7 +183,10 @@ class BatchEndpointTest extends EndpointTestBase
                             'address_position' => 'left',
                             'price_currency' => 'CHF',
                             'price_value' => 1.25,
-                            'delivery_product' => 'fast',
+                            'delivery_products' => [
+                                'country' => 'CH',
+                                'delivery_product' => 'fast'
+                            ],
                             'print_mode' => 'simplex',
                             'print_spectrum' => 'color',
                             'created_at' => '2020-11-19T09:42:48+0100',
@@ -268,7 +274,10 @@ class BatchEndpointTest extends EndpointTestBase
                             'address_position' => 'left',
                             'price_currency' => 'CHF',
                             'price_value' => 1.25,
-                            'delivery_product' => 'fast',
+                            'delivery_products' => [
+                                'country' => 'CH',
+                                'delivery_product' => 'fast'
+                            ],
                             'print_mode' => 'simplex',
                             'print_spectrum' => 'color',
                             'created_at' => '2020-11-19T09:42:48+0100',
@@ -346,7 +355,10 @@ class BatchEndpointTest extends EndpointTestBase
                             'address_position' => 'left',
                             'price_currency' => 'CHF',
                             'price_value' => 1.25,
-                            'delivery_product' => 'fast',
+                            'delivery_products' => [
+                                'country' => 'CH',
+                                'delivery_product' => 'fast'
+                            ],
                             'print_mode' => 'simplex',
                             'print_spectrum' => 'color',
                             'created_at' => '2020-11-19T09:42:48+0100',
@@ -356,7 +368,7 @@ class BatchEndpointTest extends EndpointTestBase
                 ]),Response::HTTP_OK);
 
         $endpoint->send($batchId, (new BatchSendAttributes())
-            ->setDeliveryProduct([
+            ->setDeliveryProducts([
                 [
                     'country' => 'CH',
                     'delivery_product' => 'postag_a'
@@ -405,7 +417,10 @@ class BatchEndpointTest extends EndpointTestBase
                             'address_position' => 'left',
                             'price_currency' => 'CHF',
                             'price_value' => 1.25,
-                            'delivery_product' => 'fast',
+                            'delivery_products' => [
+                                'country' => 'CH',
+                                'delivery_product' => 'fast'
+                            ],
                             'print_mode' => 'simplex',
                             'print_spectrum' => 'color',
                             'created_at' => '2020-11-19T09:42:48+0100',

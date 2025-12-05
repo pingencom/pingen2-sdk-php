@@ -55,7 +55,13 @@ abstract class Input implements Arrayable
 
         collect($this->touchedBySetter)
             ->each(function ($property) use (&$data): void {
-                $data[$property] = $this->{$property};
+                $propertyValue = $this->{$property};
+
+                if ($this->{$property} instanceof self) {
+                    $propertyValue = $this->{$property}->toArray();
+                }
+
+                $data[$property] = $propertyValue;
             });
 
         return $data;
