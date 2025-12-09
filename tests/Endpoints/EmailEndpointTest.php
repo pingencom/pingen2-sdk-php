@@ -286,9 +286,20 @@ class EmailEndpointTest extends EndpointTestBase
         $file = tmpfile();
 
         try {
-            $endpoint->uploadAndCreate((new EmailCreateAttributes())
+            $endpoint->uploadAndCreate(
+                (new EmailCreateAttributes())
                 ->setFileOriginalName('lorem.pdf')
-                ->setAutoSend(false), $file);
+                ->setAutoSend(false),
+                $file,
+                [
+                    'preset' => [
+                        'data' => [
+                            'id' => '7e500ff8-0000-0000-0000-b7de227d1081',
+                            'type' => 'presets'
+                        ]
+                    ]
+                ]
+            );
         } catch (JsonApiException $e) {
             $this->assertEquals(Response::HTTP_UNAUTHORIZED, $e->getCode());
         }

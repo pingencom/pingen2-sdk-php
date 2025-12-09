@@ -99,7 +99,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @throws RequestException
      * @throws ValidationException
      */
-    public function uploadAndCreate(LetterCreateAttributes $letterCreateAttributes, $file, array $relationshipPreset = []): LetterDetails
+    public function uploadAndCreate(LetterCreateAttributes $letterCreateAttributes, $file, array $relationships = []): LetterDetails
     {
         $letterCreateAttributes->validate(['file_url', 'file_url_signature']);
 
@@ -115,7 +115,7 @@ class LettersEndpoint extends ResourceEndpoint
             ->setFileUrl($fileUploadDetails->data->attributes->url)
             ->setFileUrlSignature($fileUploadDetails->data->attributes->url_signature);
 
-        return $this->create($letterCreateAttributes, $relationshipPreset);
+        return $this->create($letterCreateAttributes, $relationships);
     }
 
     /**
@@ -124,7 +124,7 @@ class LettersEndpoint extends ResourceEndpoint
      * @throws RequestException
      * @throws ValidationException
      */
-    public function create(LetterCreateAttributes $letterCreateAttributes, array $relationshipPreset = []): LetterDetails
+    public function create(LetterCreateAttributes $letterCreateAttributes, array $relationships = []): LetterDetails
     {
         $letterCreateAttributes->validate();
 
@@ -133,7 +133,7 @@ class LettersEndpoint extends ResourceEndpoint
                 sprintf('/organisations/%s/letters/', $this->getOrganisationId()),
                 'letters',
                 $letterCreateAttributes,
-                $relationshipPreset
+                $relationships
             )->json()
         );
     }
