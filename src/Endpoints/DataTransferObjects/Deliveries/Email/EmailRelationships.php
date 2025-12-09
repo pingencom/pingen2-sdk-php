@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pingen\Endpoints\DataTransferObjects\Deliveries\Email;
 
 use Pingen\Endpoints\DataTransferObjects\General\RelationshipRelatedItem;
+use Pingen\Endpoints\DataTransferObjects\General\RelationshipRelatedMany;
 use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
@@ -13,4 +14,5 @@ use Pingen\Support\DataTransferObject\DataTransferObject;
 class EmailRelationships extends DataTransferObject
 {
     public RelationshipRelatedItem $organisation;
+    public RelationshipRelatedMany $events;
 }
