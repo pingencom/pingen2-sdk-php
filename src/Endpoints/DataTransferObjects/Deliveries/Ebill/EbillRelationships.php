@@ -14,5 +14,6 @@ use Pingen\Support\DataTransferObject\DataTransferObject;
 class EbillRelationships extends DataTransferObject
 {
     public RelationshipRelatedItem $organisation;
+
     public RelationshipRelatedMany $events;
 }

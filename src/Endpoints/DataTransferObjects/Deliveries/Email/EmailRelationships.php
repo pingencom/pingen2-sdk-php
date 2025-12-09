@@ -14,5 +14,6 @@ use Pingen\Support\DataTransferObject\DataTransferObject;
 class EmailRelationships extends DataTransferObject
 {
     public RelationshipRelatedItem $organisation;
+
     public RelationshipRelatedMany $events;
 }
