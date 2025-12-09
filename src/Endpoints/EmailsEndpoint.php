@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Pingen\Endpoints;
 
 use Illuminate\Http\Client\RequestException;
-use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillCollection;
-use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillCollectionItem;
-use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillCreateAttributes;
-use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillDetails;
-use Pingen\Endpoints\ParameterBags\EbillCollectionParameterBag;
-use Pingen\Endpoints\ParameterBags\EbillParameterBag;
+use Pingen\Endpoints\DataTransferObjects\Deliveries\Email\EmailCollection;
+use Pingen\Endpoints\DataTransferObjects\Deliveries\Email\EmailCollectionItem;
+use Pingen\Endpoints\DataTransferObjects\Deliveries\Email\EmailCreateAttributes;
+use Pingen\Endpoints\DataTransferObjects\Deliveries\Email\EmailDetails;
+use Pingen\Endpoints\ParameterBags\EmailCollectionParameterBag;
+use Pingen\Endpoints\ParameterBags\EmailParameterBag;
 use Pingen\Exceptions\RateLimitJsonApiException;
 use Pingen\Exceptions\ValidationException;
 use Pingen\ResourceEndpoint;
@@ -19,52 +19,52 @@ use Pingen\Support\HasOrganisationContext;
 /**
  * @package Pingen\Endpoints
  */
-class EbillEndpoint extends ResourceEndpoint
+class EmailsEndpoint extends ResourceEndpoint
 {
     use HasOrganisationContext;
 
     /**
-     * @param string $ebillId
-     * @param ?EbillParameterBag $parameterBag
-     * @return EbillDetails
+     * @param string $emailId
+     * @param ?EmailParameterBag $parameterBag
+     * @return EmailDetails
      * @throws RequestException
      */
-    public function getDetails(string $ebillId, ?EbillParameterBag $parameterBag = null): EbillDetails
+    public function getDetails(string $emailId, ?EmailParameterBag $parameterBag = null): EmailDetails
     {
-        return new EbillDetails(
+        return new EmailDetails(
             $this->performGetDetailsRequest(
-                sprintf('/organisations/%s/deliveries/ebills/%s', $this->getOrganisationId(), $ebillId),
-                $parameterBag ?? new EbillParameterBag()
+                sprintf('/organisations/%s/deliveries/emails/%s', $this->getOrganisationId(), $emailId),
+                $parameterBag ?? new EmailParameterBag()
             )->json()
         );
     }
 
     /**
-     * @param ?EbillCollectionParameterBag $ebillCollectionParameterBag
-     * @return EbillCollection
+     * @param ?EmailCollectionParameterBag $emailCollectionParameterBag
+     * @return EmailCollection
      * @throws RateLimitJsonApiException
      * @throws RequestException
      */
-    public function getCollection(?EbillCollectionParameterBag $ebillCollectionParameterBag = null): EbillCollection
+    public function getCollection(?EmailCollectionParameterBag $emailCollectionParameterBag = null): EmailCollection
     {
-        return new EbillCollection(
+        return new EmailCollection(
             $this
                 ->performGetCollectionRequest(
-                    sprintf('/organisations/%s/deliveries/ebills/', $this->getOrganisationId()),
-                    $ebillCollectionParameterBag ?? (new EbillCollectionParameterBag())
+                    sprintf('/organisations/%s/deliveries/emails/', $this->getOrganisationId()),
+                    $emailCollectionParameterBag ?? (new EmailCollectionParameterBag())
                 )->json()
         );
     }
 
     /**
-     * @param ?EbillCollectionParameterBag $listParameterBag
-     * @return \Generator|EbillCollectionItem[]
+     * @param ?EmailCollectionParameterBag $listParameterBag
+     * @return \Generator|EmailCollectionItem[]
      * @throws RequestException
      */
-    public function iterateOverCollection(?EbillCollectionParameterBag $listParameterBag = null)
+    public function iterateOverCollection(?EmailCollectionParameterBag $listParameterBag = null)
     {
         if ($listParameterBag === null) {
-            $listParameterBag = new EbillCollectionParameterBag();
+            $listParameterBag = new EmailCollectionParameterBag();
         }
 
         try {
@@ -85,16 +85,16 @@ class EbillEndpoint extends ResourceEndpoint
     }
 
     /**
-     * @param EbillCreateAttributes $ebillCreateAttributes
+     * @param EmailCreateAttributes $emailCreateAttributes
      * @param resource|string $file File content as string, or resource
      * @param array $relationships
-     * @return EbillDetails
+     * @return EmailDetails
      * @throws RequestException
      * @throws ValidationException
      */
-    public function uploadAndCreate(EbillCreateAttributes $ebillCreateAttributes, $file, array $relationships = []): EbillDetails
+    public function uploadAndCreate(EmailCreateAttributes $emailCreateAttributes, $file, array $relationships = []): EmailDetails
     {
-        $ebillCreateAttributes->validate(['file_url', 'file_url_signature']);
+        $emailCreateAttributes->validate(['file_url', 'file_url_signature']);
 
         $fileUploadEndpoint = $this->getFileUploadEndpoint();
         if ($this->isUsingStaging()) {
@@ -104,29 +104,29 @@ class EbillEndpoint extends ResourceEndpoint
         $fileUploadDetails = $fileUploadEndpoint->requestFileUpload();
         $fileUploadEndpoint->uploadFile($fileUploadDetails, $file);
 
-        $ebillCreateAttributes
+        $emailCreateAttributes
             ->setFileUrl($fileUploadDetails->data->attributes->url)
             ->setFileUrlSignature($fileUploadDetails->data->attributes->url_signature);
 
-        return $this->create($ebillCreateAttributes, $relationships);
+        return $this->create($emailCreateAttributes, $relationships);
     }
 
     /**
-     * @param EbillCreateAttributes $ebillCreateAttributes
+     * @param EmailCreateAttributes $emailCreateAttributes
      * @param array $relationships
-     * @return EbillDetails
+     * @return EmailDetails
      * @throws RequestException
      * @throws ValidationException
      */
-    public function create(EbillCreateAttributes $ebillCreateAttributes, array $relationships = []): EbillDetails
+    public function create(EmailCreateAttributes $emailCreateAttributes, array $relationships = []): EmailDetails
     {
-        $ebillCreateAttributes->validate();
+        $emailCreateAttributes->validate();
 
-        return new EbillDetails(
+        return new EmailDetails(
             $this->performPostRequest(
-                sprintf('/organisations/%s/deliveries/ebills/', $this->getOrganisationId()),
-                'ebills',
-                $ebillCreateAttributes,
+                sprintf('/organisations/%s/deliveries/emails/', $this->getOrganisationId()),
+                'emails',
+                $emailCreateAttributes,
                 $relationships
             )->json()
         );

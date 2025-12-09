@@ -14,7 +14,7 @@ use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillDetailsData;
 use Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillMetaDataAttributes;
 use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadAttributes;
 use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetailsData;
-use Pingen\Endpoints\EbillEndpoint;
+use Pingen\Endpoints\EbillsEndpoint;
 use Pingen\Endpoints\FileUploadEndpoint;
 use Pingen\Endpoints\ParameterBags\EbillCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\EbillParameterBag;
@@ -22,7 +22,7 @@ use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\JsonApiExceptionError;
 use Pingen\Exceptions\JsonApiExceptionErrorSource;
 
-class EbillEndpointTest extends EndpointTestBase
+class EbillsEndpointTest extends EndpointTestBase
 {
     public function testGetEBillCollection(): void
     {
@@ -31,7 +31,7 @@ class EbillEndpointTest extends EndpointTestBase
             ->setPageNumber(2)
             ->setFieldsEBill(['status']);
 
-        $endpoint = (new EbillEndpoint($this->getAccessToken()))
+        $endpoint = (new EbillsEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -56,7 +56,7 @@ class EbillEndpointTest extends EndpointTestBase
         $ebillId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new EbillEndpoint($this->getAccessToken()))
+        $endpoint = (new EbillsEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -109,7 +109,7 @@ class EbillEndpointTest extends EndpointTestBase
             ->setQ('test')
             ->setInclude(['organisations']);
 
-        $endpoint = (new EbillEndpoint($this->getAccessToken()))
+        $endpoint = (new EbillsEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -133,7 +133,7 @@ class EbillEndpointTest extends EndpointTestBase
 
     public function testIterateOverCollectionRateLimit(): void
     {
-        $endpoint = (new EbillEndpoint($this->getAccessToken()))
+        $endpoint = (new EbillsEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -163,7 +163,7 @@ class EbillEndpointTest extends EndpointTestBase
         $ebillId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new EbillEndpoint($this->getAccessToken()))
+        $endpoint = (new EbillsEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -235,7 +235,7 @@ class EbillEndpointTest extends EndpointTestBase
             ]),Response::HTTP_OK)
             ->push('', Response::HTTP_OK);
 
-        $endpoint = $this->createPartialMock(EbillEndpoint::class, ['getFileUploadEndpoint']);
+        $endpoint = $this->createPartialMock(EbillsEndpoint::class, ['getFileUploadEndpoint']);
         $endpoint->method('getFileUploadEndpoint')->willReturn($fileUploadEndpoint);
         $endpoint->setAccessToken($this->getAccessToken())
              ->setHttpClient(new HttpClient());
@@ -299,7 +299,7 @@ class EbillEndpointTest extends EndpointTestBase
     {
         $organisationId = 'orgId';
 
-        $endpoint = new EbillEndpoint($this->getAccessToken());
+        $endpoint = new EbillsEndpoint($this->getAccessToken());
         $endpoint->setOrganisationId($organisationId);
 
         /** @var resource $file */
