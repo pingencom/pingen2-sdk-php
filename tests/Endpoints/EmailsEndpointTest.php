@@ -14,7 +14,7 @@ use Pingen\Endpoints\DataTransferObjects\Deliveries\Email\EmailDetailsData;
 use Pingen\Endpoints\DataTransferObjects\Deliveries\Email\EmailMetaDataAttributes;
 use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadAttributes;
 use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetailsData;
-use Pingen\Endpoints\EmailEndpoint;
+use Pingen\Endpoints\EmailsEndpoint;
 use Pingen\Endpoints\FileUploadEndpoint;
 use Pingen\Endpoints\ParameterBags\EmailCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\EmailParameterBag;
@@ -22,7 +22,7 @@ use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\JsonApiExceptionError;
 use Pingen\Exceptions\JsonApiExceptionErrorSource;
 
-class EmailEndpointTest extends EndpointTestBase
+class EmailsEndpointTest extends EndpointTestBase
 {
     public function testGetEmailCollection(): void
     {
@@ -31,7 +31,7 @@ class EmailEndpointTest extends EndpointTestBase
             ->setPageNumber(2)
             ->setFieldsEmail(['status']);
 
-        $endpoint = (new EmailEndpoint($this->getAccessToken()))
+        $endpoint = (new EmailsEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -56,7 +56,7 @@ class EmailEndpointTest extends EndpointTestBase
         $emailId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new EmailEndpoint($this->getAccessToken()))
+        $endpoint = (new EmailsEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -104,7 +104,7 @@ class EmailEndpointTest extends EndpointTestBase
             ->setQ('test')
             ->setInclude(['organisations']);
 
-        $endpoint = (new EmailEndpoint($this->getAccessToken()))
+        $endpoint = (new EmailsEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -128,7 +128,7 @@ class EmailEndpointTest extends EndpointTestBase
 
     public function testIterateOverCollectionRateLimit(): void
     {
-        $endpoint = (new EmailEndpoint($this->getAccessToken()))
+        $endpoint = (new EmailsEndpoint($this->getAccessToken()))
             ->setOrganisationId('example');
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -158,7 +158,7 @@ class EmailEndpointTest extends EndpointTestBase
         $emailId = 'exampleId';
         $organisationId = 'orgId';
 
-        $endpoint = (new EmailEndpoint($this->getAccessToken()))
+        $endpoint = (new EmailsEndpoint($this->getAccessToken()))
             ->setOrganisationId($organisationId);
 
         $endpoint->getHttpClient()->fakeSequence()
@@ -228,7 +228,7 @@ class EmailEndpointTest extends EndpointTestBase
             ]),Response::HTTP_OK)
             ->push('', Response::HTTP_OK);
 
-        $endpoint = $this->createPartialMock(EmailEndpoint::class, ['getFileUploadEndpoint']);
+        $endpoint = $this->createPartialMock(EmailsEndpoint::class, ['getFileUploadEndpoint']);
         $endpoint->method('getFileUploadEndpoint')->willReturn($fileUploadEndpoint);
         $endpoint->setAccessToken($this->getAccessToken())
              ->setHttpClient(new HttpClient());
@@ -279,7 +279,7 @@ class EmailEndpointTest extends EndpointTestBase
     {
         $organisationId = 'orgId';
 
-        $endpoint = new EmailEndpoint($this->getAccessToken());
+        $endpoint = new EmailsEndpoint($this->getAccessToken());
         $endpoint->setOrganisationId($organisationId);
 
         /** @var resource $file */
