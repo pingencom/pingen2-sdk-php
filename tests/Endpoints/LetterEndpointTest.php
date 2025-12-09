@@ -308,10 +308,21 @@ class LetterEndpointTest extends EndpointTestBase
         /** @var resource $file */
         $file = tmpfile();
 
-        $endpoint->uploadAndCreate((new LetterCreateAttributes())
+        $endpoint->uploadAndCreate(
+            (new LetterCreateAttributes())
             ->setFileOriginalName('lorem.pdf')
             ->setAddressPosition('left')
-            ->setAutoSend(false), $file);
+            ->setAutoSend(false),
+            $file,
+            [
+                'preset' => [
+                    'data' => [
+                        'id' => '7e500ff8-0000-0000-0000-b7de227d1081',
+                        'type' => 'presets'
+                    ]
+                ]
+            ]
+        );
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {
