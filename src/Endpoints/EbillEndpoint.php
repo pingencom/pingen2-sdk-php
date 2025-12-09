@@ -87,12 +87,12 @@ class EbillEndpoint extends ResourceEndpoint
     /**
      * @param EbillCreateAttributes $ebillCreateAttributes
      * @param resource|string $file File content as string, or resource
-     * @param array $relationshipPreset
+     * @param array $relationships
      * @return EbillDetails
      * @throws RequestException
      * @throws ValidationException
      */
-    public function uploadAndCreate(EbillCreateAttributes $ebillCreateAttributes, $file, array $relationshipPreset = []): EbillDetails
+    public function uploadAndCreate(EbillCreateAttributes $ebillCreateAttributes, $file, array $relationships = []): EbillDetails
     {
         $ebillCreateAttributes->validate(['file_url', 'file_url_signature']);
 
@@ -108,17 +108,17 @@ class EbillEndpoint extends ResourceEndpoint
             ->setFileUrl($fileUploadDetails->data->attributes->url)
             ->setFileUrlSignature($fileUploadDetails->data->attributes->url_signature);
 
-        return $this->create($ebillCreateAttributes, $relationshipPreset);
+        return $this->create($ebillCreateAttributes, $relationships);
     }
 
     /**
      * @param EbillCreateAttributes $ebillCreateAttributes
-     * @param array $relationshipPreset
+     * @param array $relationships
      * @return EbillDetails
      * @throws RequestException
      * @throws ValidationException
      */
-    public function create(EbillCreateAttributes $ebillCreateAttributes, array $relationshipPreset = []): EbillDetails
+    public function create(EbillCreateAttributes $ebillCreateAttributes, array $relationships = []): EbillDetails
     {
         $ebillCreateAttributes->validate();
 
@@ -127,7 +127,7 @@ class EbillEndpoint extends ResourceEndpoint
                 sprintf('/organisations/%s/deliveries/ebills/', $this->getOrganisationId()),
                 'ebills',
                 $ebillCreateAttributes,
-                $relationshipPreset
+                $relationships
             )->json()
         );
     }

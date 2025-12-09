@@ -87,11 +87,12 @@ class EmailEndpoint extends ResourceEndpoint
     /**
      * @param EmailCreateAttributes $emailCreateAttributes
      * @param resource|string $file File content as string, or resource
+     * @param array $relationships
      * @return EmailDetails
      * @throws RequestException
      * @throws ValidationException
      */
-    public function uploadAndCreate(EmailCreateAttributes $emailCreateAttributes, $file): EmailDetails
+    public function uploadAndCreate(EmailCreateAttributes $emailCreateAttributes, $file, array $relationships = []): EmailDetails
     {
         $emailCreateAttributes->validate(['file_url', 'file_url_signature']);
 
@@ -107,16 +108,17 @@ class EmailEndpoint extends ResourceEndpoint
             ->setFileUrl($fileUploadDetails->data->attributes->url)
             ->setFileUrlSignature($fileUploadDetails->data->attributes->url_signature);
 
-        return $this->create($emailCreateAttributes);
+        return $this->create($emailCreateAttributes, $relationships);
     }
 
     /**
      * @param EmailCreateAttributes $emailCreateAttributes
+     * @param array $relationships
      * @return EmailDetails
      * @throws RequestException
      * @throws ValidationException
      */
-    public function create(EmailCreateAttributes $emailCreateAttributes): EmailDetails
+    public function create(EmailCreateAttributes $emailCreateAttributes, array $relationships = []): EmailDetails
     {
         $emailCreateAttributes->validate();
 
@@ -125,6 +127,7 @@ class EmailEndpoint extends ResourceEndpoint
                 sprintf('/organisations/%s/deliveries/emails/', $this->getOrganisationId()),
                 'emails',
                 $emailCreateAttributes,
+                $relationships
             )->json()
         );
     }
