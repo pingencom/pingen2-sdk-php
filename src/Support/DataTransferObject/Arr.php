@@ -59,7 +59,7 @@ class Arr
                 }
             }
 
-            unset($array[array_shift($parts)]);
+            unset($array[(string) array_shift($parts)]);
         }
 
         return $array;

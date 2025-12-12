@@ -125,9 +125,9 @@ REGEXP;
 
     private function normaliseTypes(?string ...$types): array
     {
-        return array_filter(array_map(
-            fn (?string $type) => self::$typeMapping[$type] ?? $type,
-            $types
+        return array_values(array_map(
+            fn (string $type) => self::$typeMapping[$type] ?? $type,
+            array_filter($types)
         ));
     }
 }
