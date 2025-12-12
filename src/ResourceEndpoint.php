@@ -8,6 +8,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Traits\Conditionable;
 use League\OAuth2\Client\Token\AccessToken;
 use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\RateLimitJsonApiException;
@@ -22,6 +23,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  */
 abstract class ResourceEndpoint
 {
+    use Conditionable;
+
     /**
      * Default timeout of http requests in seconds
      */
