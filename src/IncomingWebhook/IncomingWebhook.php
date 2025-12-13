@@ -46,7 +46,7 @@ class IncomingWebhook
 
         if (! hash_equals(
             hash_hmac('sha256', (string) $request->getContent(), $this->secret),
-            $request->header('Signature')
+            (string) $request->header('Signature')
         )) {
             throw new WebhookSignatureException('Webhook signature matching failed.');
         }
