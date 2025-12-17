@@ -9,7 +9,7 @@ use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Traits\Conditionable;
-use League\OAuth2\Client\Token\AccessToken;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\RateLimitJsonApiException;
 use Pingen\Support\CollectionParameterBag;
@@ -30,7 +30,7 @@ abstract class ResourceEndpoint
      */
     public const DEFAULT_REQUEST_TIMEOUT = 20;
 
-    protected AccessToken $accessToken;
+    protected AccessTokenInterface $accessToken;
 
     protected HttpClient $httpClient;
 
@@ -44,9 +44,9 @@ abstract class ResourceEndpoint
 
     /**
      * Endpoint constructor.
-     * @param AccessToken $accessToken
+     * @param AccessTokenInterface $accessToken
      */
-    public function __construct(AccessToken $accessToken)
+    public function __construct(AccessTokenInterface $accessToken)
     {
         $this->setAccessToken($accessToken);
         $this->setHttpClient(new HttpClient());
@@ -82,19 +82,19 @@ abstract class ResourceEndpoint
     }
 
     /**
-     * @param AccessToken $accessToken
+     * @param AccessTokenInterface $accessToken
      * @return ResourceEndpoint
      */
-    public function setAccessToken(AccessToken $accessToken): self
+    public function setAccessToken(AccessTokenInterface $accessToken): self
     {
         $this->accessToken = $accessToken;
         return $this;
     }
 
     /**
-     * @return AccessToken
+     * @return AccessTokenInterface
      */
-    public function getAccessToken(): AccessToken
+    public function getAccessToken(): AccessTokenInterface
     {
         return $this->accessToken;
     }
