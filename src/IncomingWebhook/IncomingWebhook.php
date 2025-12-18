@@ -40,11 +40,16 @@ class IncomingWebhook
             throw new WebhookSignatureException('Only POST requests are allowed.');
         }
 
-        if (! $request->hasHeader('Signature')) {
+        $signature = $request->header('Signature');
+
+        if (! is_string($signature)) {
             throw new WebhookSignatureException('Signature missing.');
         }
 
-        if ($request->header('Signature') !== hash_hmac('sha256', (string) $request->getContent(), $this->secret)) {
+        if (! hash_equals(
+            hash_hmac('sha256', (string) $request->getContent(), $this->secret),
+            $signature
+        )) {
             throw new WebhookSignatureException('Webhook signature matching failed.');
         }
     }
