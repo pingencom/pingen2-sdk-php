@@ -41,7 +41,7 @@ class LettersEndpoint extends ResourceEndpoint
     {
         return new LetterDetails(
             $this->performGetDetailsRequest(
-                sprintf('/organisations/%s/letters/%s', $this->getOrganisationId(), $letterId),
+                sprintf('/organisations/%s/deliveries/letters/%s', $this->getOrganisationId(), $letterId),
                 $parameterBag ?? (new LetterParameterBag())
             )->json()
         );
@@ -58,7 +58,7 @@ class LettersEndpoint extends ResourceEndpoint
         return new LetterCollection(
             $this
                 ->performGetCollectionRequest(
-                    sprintf('/organisations/%s/letters/', $this->getOrganisationId()),
+                    sprintf('/organisations/%s/deliveries/letters/', $this->getOrganisationId()),
                     $letterCollectionParameterBag ?? (new LetterCollectionParameterBag())
                 )->json()
         );
@@ -130,7 +130,7 @@ class LettersEndpoint extends ResourceEndpoint
 
         return new LetterDetails(
             $this->performPostRequest(
-                sprintf('/organisations/%s/letters/', $this->getOrganisationId()),
+                sprintf('/organisations/%s/deliveries/letters/', $this->getOrganisationId()),
                 'letters',
                 $letterCreateAttributes,
                 $relationships
@@ -150,7 +150,7 @@ class LettersEndpoint extends ResourceEndpoint
 
         return new LetterPrice(
             $this->performPostRequest(
-                sprintf('/organisations/%s/letters/price-calculator', $this->getOrganisationId()),
+                sprintf('/organisations/%s/deliveries/letters/price-calculator', $this->getOrganisationId()),
                 'letter_price_calculator',
                 $letterPriceCalculationAttributes
             )->json()
@@ -171,7 +171,7 @@ class LettersEndpoint extends ResourceEndpoint
 
         return new LetterDetails(
             $this->performPatchRequest(
-                sprintf('/organisations/%s/letters/%s/send', $this->getOrganisationId(), $letterId),
+                sprintf('/organisations/%s/deliveries/letters/%s/send', $this->getOrganisationId(), $letterId),
                 'letters',
                 $letterId,
                 $letterSendAttributes
@@ -193,7 +193,7 @@ class LettersEndpoint extends ResourceEndpoint
 
         return new LetterDetails(
             $this->performPatchRequest(
-                sprintf('/organisations/%s/letters/%s', $this->getOrganisationId(), $letterId),
+                sprintf('/organisations/%s/deliveries/letters/%s', $this->getOrganisationId(), $letterId),
                 'letters',
                 $letterId,
                 $letterEditAttributes
@@ -210,7 +210,7 @@ class LettersEndpoint extends ResourceEndpoint
     public function cancel(string $letterId): void
     {
         $this->performPatchRequest(
-            sprintf('/organisations/%s/letters/%s/cancel', $this->getOrganisationId(), $letterId),
+            sprintf('/organisations/%s/deliveries/letters/%s/cancel', $this->getOrganisationId(), $letterId),
             'letters',
             $letterId
         );
@@ -225,7 +225,7 @@ class LettersEndpoint extends ResourceEndpoint
     public function delete(string $letterId): void
     {
         $this->performDeleteRequest(
-            sprintf('/organisations/%s/letters/%s', $this->getOrganisationId(), $letterId)
+            sprintf('/organisations/%s/deliveries/letters/%s', $this->getOrganisationId(), $letterId)
         );
     }
 
@@ -238,7 +238,7 @@ class LettersEndpoint extends ResourceEndpoint
     public function getFile(string $letterId)
     {
         $response = $this->performGetRequest(
-            sprintf('/organisations/%s/letters/%s/file', $this->getOrganisationId(), $letterId)
+            sprintf('/organisations/%s/deliveries/letters/%s/file', $this->getOrganisationId(), $letterId)
         );
 
         $tmpFile = tmpfile();
@@ -262,7 +262,7 @@ class LettersEndpoint extends ResourceEndpoint
     public function addAttachment(string $letterId, LetterAddAttachmentAttributes $letterAddAttachmentAttributes): void
     {
         $this->performPatchRequest(
-            sprintf('/organisations/%s/letters/%s/attachment', $this->getOrganisationId(), $letterId),
+            sprintf('/organisations/%s/deliveries/letters/%s/attachment', $this->getOrganisationId(), $letterId),
             'letters',
             $letterId,
             $letterAddAttachmentAttributes
@@ -280,7 +280,7 @@ class LettersEndpoint extends ResourceEndpoint
         /** @var Response $response */
         $response = $this->getAuthenticatedJsonApiRequest()
             ->patch(
-                $this->getResourceBaseUrl() . sprintf('/organisations/%s/letters/attachment', $this->getOrganisationId()),
+                $this->getResourceBaseUrl() . sprintf('/organisations/%s/deliveries/letters/attachment', $this->getOrganisationId()),
                 [
                     'data' => [
                         'type' => 'letters_attachment',

@@ -52,7 +52,7 @@ class LetterEndpointTest extends EndpointTestBase
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/deliveries/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status');
             }
         );
 
@@ -104,7 +104,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $letterId, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId) . '?fields%5Bletters%5D=status',
+                    sprintf('%s/organisations/%s/deliveries/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId) . '?fields%5Bletters%5D=status',
                     $request->url()
                 );
             }
@@ -138,7 +138,7 @@ class LetterEndpointTest extends EndpointTestBase
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2&sort=created_at&filter=%7B%22name%22%3A%22testName%22%7D&q=test&include=organisations');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/deliveries/letters/?page%5Blimit%5D=10&page%5Bnumber%5D=2&sort=created_at&filter=%7B%22name%22%3A%22testName%22%7D&q=test&include=organisations');
             }
         );
 
@@ -165,7 +165,7 @@ class LetterEndpointTest extends EndpointTestBase
 
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
-                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/letters/');
+                $this->assertEquals($request->url(), $endpoint->getResourceBaseUrl() . '/organisations/example/deliveries/letters/');
             }
         );
 
@@ -229,7 +229,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/', $endpoint->getResourceBaseUrl(), $organisationId),
+                    sprintf('%s/organisations/%s/deliveries/letters/', $endpoint->getResourceBaseUrl(), $organisationId),
                     $request->url()
                 );
             }
@@ -327,7 +327,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/', $endpoint->getResourceBaseUrl(), $organisationId),
+                    sprintf('%s/organisations/%s/deliveries/letters/', $endpoint->getResourceBaseUrl(), $organisationId),
                     $request->url()
                 );
             }
@@ -403,7 +403,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $letterId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s/send', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/deliveries/letters/%s/send', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
                     $request->url()
                 );
             }
@@ -449,7 +449,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $letterId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/deliveries/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
                     $request->url()
                 );
             }
@@ -474,7 +474,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $letterId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s/cancel', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/deliveries/letters/%s/cancel', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
                     $request->url()
                 );
             }
@@ -499,7 +499,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $letterId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/deliveries/letters/%s', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
                     $request->url()
                 );
             }
@@ -537,7 +537,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/price-calculator', $endpoint->getResourceBaseUrl(), $organisationId),
+                    sprintf('%s/organisations/%s/deliveries/letters/price-calculator', $endpoint->getResourceBaseUrl(), $organisationId),
                     $request->url()
                 );
             }
@@ -562,7 +562,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $letterId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/deliveries/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
                     $request->url()
                 );
             }
@@ -595,7 +595,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $letterId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/deliveries/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
                     $request->url()
                 );
             }
@@ -629,7 +629,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $letterId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/deliveries/letters/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
                     $request->url()
                 );
             }
@@ -655,7 +655,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId, $letterId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/%s/attachment', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
+                    sprintf('%s/organisations/%s/deliveries/letters/%s/attachment', $endpoint->getResourceBaseUrl(), $organisationId, $letterId),
                     $request->url()
                 );
             }
@@ -685,7 +685,7 @@ class LetterEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint, $organisationId): void {
                 $this->assertEquals(
-                    sprintf('%s/organisations/%s/letters/attachment', $endpoint->getResourceBaseUrl(), $organisationId),
+                    sprintf('%s/organisations/%s/deliveries/letters/attachment', $endpoint->getResourceBaseUrl(), $organisationId),
                     $request->url()
                 );
             }
