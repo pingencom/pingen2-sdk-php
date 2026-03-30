@@ -39,7 +39,7 @@ class LetterEventsEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    $endpoint->getResourceBaseUrl() . '/organisations/example/letters/exampleLetterID/events?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
+                    $endpoint->getResourceBaseUrl() . '/organisations/example/deliveries/letters/exampleLetterID/events?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
                     $request->url()
                 );
             }
@@ -72,7 +72,7 @@ class LetterEventsEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    $endpoint->getResourceBaseUrl() . '/organisations/example/letters/events/issues?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
+                    $endpoint->getResourceBaseUrl() . '/organisations/example/deliveries/letters/events/issues?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
                     $request->url()
                 );
             }
@@ -105,7 +105,7 @@ class LetterEventsEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    $endpoint->getResourceBaseUrl() . '/organisations/example/letters/events/sent?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
+                    $endpoint->getResourceBaseUrl() . '/organisations/example/deliveries/letters/events/sent?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
                     $request->url()
                 );
             }
@@ -138,7 +138,7 @@ class LetterEventsEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    $endpoint->getResourceBaseUrl() . '/organisations/example/letters/events/undeliverable?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
+                    $endpoint->getResourceBaseUrl() . '/organisations/example/deliveries/letters/events/undeliverable?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
                     $request->url()
                 );
             }
@@ -171,7 +171,7 @@ class LetterEventsEndpointTest extends EndpointTestBase
         $endpoint->getHttpClient()->recorded(
             function (Request $request) use ($endpoint): void {
                 $this->assertEquals(
-                    $endpoint->getResourceBaseUrl() . '/organisations/example/letters/events/delivered?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
+                    $endpoint->getResourceBaseUrl() . '/organisations/example/deliveries/letters/events/delivered?page%5Blimit%5D=10&page%5Bnumber%5D=2&fields%5Bletters%5D=status&fields%5Bletters_events%5D=code&language=en-GB',
                     $request->url()
                 );
             }

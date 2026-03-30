@@ -31,7 +31,7 @@ class LetterEventsEndpoint extends ResourceEndpoint
         return new LetterEventCollection(
             $this
                 ->performGetCollectionRequest(
-                    sprintf('/organisations/%s/letters/%s/events', $this->getOrganisationId(), $this->getLetterId()),
+                    sprintf('/organisations/%s/deliveries/letters/%s/events', $this->getOrganisationId(), $this->getLetterId()),
                     $letterEventCollectionParameterBag ?? (new LetterEventCollectionParameterBag())
                 )->json()
         );
@@ -48,7 +48,7 @@ class LetterEventsEndpoint extends ResourceEndpoint
         return new LetterEventCollection(
             $this
                 ->performGetCollectionRequest(
-                    sprintf('/organisations/%s/letters/events/issues', $this->getOrganisationId()),
+                    sprintf('/organisations/%s/deliveries/letters/events/issues', $this->getOrganisationId()),
                     $letterEventCollectionParameterBag ?? (new LetterEventCollectionParameterBag())
                 )->json()
         );
@@ -65,7 +65,7 @@ class LetterEventsEndpoint extends ResourceEndpoint
         return new LetterEventCollection(
             $this
                 ->performGetCollectionRequest(
-                    sprintf('/organisations/%s/letters/events/sent', $this->getOrganisationId()),
+                    sprintf('/organisations/%s/deliveries/letters/events/sent', $this->getOrganisationId()),
                     $letterEventCollectionParameterBag ?? (new LetterEventCollectionParameterBag())
                 )->json()
         );
@@ -82,7 +82,7 @@ class LetterEventsEndpoint extends ResourceEndpoint
         return new LetterEventCollection(
             $this
                 ->performGetCollectionRequest(
-                    sprintf('/organisations/%s/letters/events/undeliverable', $this->getOrganisationId()),
+                    sprintf('/organisations/%s/deliveries/letters/events/undeliverable', $this->getOrganisationId()),
                     $letterEventCollectionParameterBag ?? (new LetterEventCollectionParameterBag())
                 )->json()
         );
@@ -99,7 +99,7 @@ class LetterEventsEndpoint extends ResourceEndpoint
         return new LetterEventCollection(
             $this
                 ->performGetCollectionRequest(
-                    sprintf('/organisations/%s/letters/events/delivered', $this->getOrganisationId()),
+                    sprintf('/organisations/%s/deliveries/letters/events/delivered', $this->getOrganisationId()),
                     $letterEventCollectionParameterBag ?? (new LetterEventCollectionParameterBag())
                 )->json()
         );
