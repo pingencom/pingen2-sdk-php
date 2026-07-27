@@ -6,7 +6,6 @@ namespace Pingen\Endpoints\DataTransferObjects\Deliveries\Email;
 
 use Pingen\Endpoints\DataTransferObjects\General\CollectionLinks;
 use Pingen\Endpoints\DataTransferObjects\General\CollectionMeta;
-use Pingen\Endpoints\DataTransferObjects\Organisation\OrganisationIncluded;
 use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
@@ -15,7 +14,7 @@ use Pingen\Support\DataTransferObject\DataTransferObject;
 class EmailCollection extends DataTransferObject
 {
     /**
-     * @var EmailCollectionItem[]
+     * @var \Pingen\Endpoints\DataTransferObjects\Deliveries\Email\EmailCollectionItem[]
      */
     public array $data;
 
@@ -24,7 +23,7 @@ class EmailCollection extends DataTransferObject
     public CollectionMeta $meta;
 
     /**
-     * @var OrganisationIncluded[]|null
+     * @var \Pingen\Endpoints\DataTransferObjects\Organisation\OrganisationIncluded[]|null
      */
     public ?array $included;
 }

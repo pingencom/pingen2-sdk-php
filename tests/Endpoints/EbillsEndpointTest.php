@@ -313,4 +313,128 @@ class EbillsEndpointTest extends EndpointTestBase
             $this->assertEquals(Response::HTTP_UNAUTHORIZED, $e->getCode());
         }
     }
+
+    public function testSend(): void
+    {
+        $ebillId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new EbillsEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push(
+                json_encode([
+                    'data' => new EbillDetailsData([
+                        'id' => $ebillId,
+                        'type' => 'ebills',
+                        'attributes' => new EbillAttributes([
+                            'status' => 'sending',
+                            'file_original_name' => 'lorem.pdf',
+                            'file_pages' => 2,
+                            'recipient_identifier' => '41100010014282213',
+                            'invoice_number' => 'Invoice 8051',
+                            'invoice_date' => '2025-10-01',
+                            'invoice_due_date' => '2025-10-30',
+                            'invoice_value' => null,
+                            'invoice_currency' => null,
+                            'source' => 'api',
+                            'submitted_at' => null,
+                            'created_at' => '2025-10-19T09:42:48+0100',
+                            'updated_at' => '2025-10-19T09:42:48+0100'
+                        ])
+                    ])
+                ]),Response::HTTP_OK);
+
+        $endpoint->send($ebillId);
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $ebillId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/deliveries/ebills/%s/send', $endpoint->getResourceBaseUrl(), $organisationId, $ebillId),
+                    $request->url()
+                );
+                $this->assertEquals('ebills', $request->data()['data']['type']);
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCancel(): void
+    {
+        $ebillId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new EbillsEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push([], Response::HTTP_ACCEPTED);
+
+        $endpoint->cancel($ebillId);
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $ebillId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/deliveries/ebills/%s/cancel', $endpoint->getResourceBaseUrl(), $organisationId, $ebillId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testDelete(): void
+    {
+        $ebillId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new EbillsEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push([], Response::HTTP_NO_CONTENT);
+
+        $endpoint->delete($ebillId);
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $ebillId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/deliveries/ebills/%s', $endpoint->getResourceBaseUrl(), $organisationId, $ebillId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testGetFile(): void
+    {
+        $ebillId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new EbillsEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push('file content', Response::HTTP_OK);
+
+        $file = $endpoint->getFile($ebillId);
+
+        $this->assertEquals('file content', stream_get_contents($file));
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $ebillId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/deliveries/ebills/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $ebillId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
 }

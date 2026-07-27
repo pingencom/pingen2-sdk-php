@@ -132,6 +132,64 @@ class EbillsEndpoint extends ResourceEndpoint
         );
     }
 
+    /**
+     * @param string $ebillId
+     * @return EbillDetails
+     * @throws RateLimitJsonApiException
+     * @throws RequestException
+     */
+    public function send(string $ebillId): EbillDetails
+    {
+        return new EbillDetails(
+            $this->performPatchIdentifierRequest(
+                sprintf('/organisations/%s/deliveries/ebills/%s/send', $this->getOrganisationId(), $ebillId),
+                'ebills',
+                $ebillId
+            )->json()
+        );
+    }
+
+    /**
+     * @param string $ebillId
+     * @return void
+     * @throws RateLimitJsonApiException
+     * @throws RequestException
+     */
+    public function cancel(string $ebillId): void
+    {
+        $this->performPatchRequest(
+            sprintf('/organisations/%s/deliveries/ebills/%s/cancel', $this->getOrganisationId(), $ebillId),
+            'ebills',
+            $ebillId
+        );
+    }
+
+    /**
+     * @param string $ebillId
+     * @return void
+     * @throws RateLimitJsonApiException
+     * @throws RequestException
+     */
+    public function delete(string $ebillId): void
+    {
+        $this->performDeleteRequest(
+            sprintf('/organisations/%s/deliveries/ebills/%s', $this->getOrganisationId(), $ebillId)
+        );
+    }
+
+    /**
+     * @param string $ebillId
+     * @return resource
+     * @throws RateLimitJsonApiException
+     * @throws RequestException
+     */
+    public function getFile(string $ebillId)
+    {
+        return $this->performGetFileRequest(
+            sprintf('/organisations/%s/deliveries/ebills/%s/file', $this->getOrganisationId(), $ebillId)
+        );
+    }
+
     protected function getFileUploadEndpoint(): FileUploadEndpoint
     {
         return new FileUploadEndpoint($this->getAccessToken());

@@ -304,4 +304,81 @@ class EmailsEndpointTest extends EndpointTestBase
             $this->assertEquals(Response::HTTP_UNAUTHORIZED, $e->getCode());
         }
     }
+
+    public function testCancel(): void
+    {
+        $emailId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new EmailsEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push([], Response::HTTP_ACCEPTED);
+
+        $endpoint->cancel($emailId);
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $emailId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/deliveries/emails/%s/cancel', $endpoint->getResourceBaseUrl(), $organisationId, $emailId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testDelete(): void
+    {
+        $emailId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new EmailsEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push([], Response::HTTP_NO_CONTENT);
+
+        $endpoint->delete($emailId);
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $emailId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/deliveries/emails/%s', $endpoint->getResourceBaseUrl(), $organisationId, $emailId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testGetFile(): void
+    {
+        $emailId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new EmailsEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push('file content', Response::HTTP_OK);
+
+        $file = $endpoint->getFile($emailId);
+
+        $this->assertEquals('file content', stream_get_contents($file));
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request) use ($endpoint, $organisationId, $emailId): void {
+                $this->assertEquals(
+                    sprintf('%s/organisations/%s/deliveries/emails/%s/file', $endpoint->getResourceBaseUrl(), $organisationId, $emailId),
+                    $request->url()
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
 }

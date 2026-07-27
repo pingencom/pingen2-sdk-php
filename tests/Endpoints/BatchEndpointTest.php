@@ -13,8 +13,10 @@ use Pingen\Endpoints\DataTransferObjects\Batch\BatchAddAttachmentAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchDetailsData;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchEbillSendAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchEditAttributes;
-use Pingen\Endpoints\DataTransferObjects\Batch\BatchSendAttributes;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchEmailSendAttributes;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchPostSendAttributes;
 use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadAttributes;
 use Pingen\Endpoints\DataTransferObjects\FileUpload\FileUploadDetailsData;
 use Pingen\Endpoints\FileUploadEndpoint;
@@ -367,17 +369,8 @@ class BatchEndpointTest extends EndpointTestBase
                     ])
                 ]),Response::HTTP_OK);
 
-        $endpoint->send($batchId, (new BatchSendAttributes())
-            ->setDeliveryProducts([
-                [
-                    'country' => 'CH',
-                    'delivery_product' => 'postag_a'
-                ],
-                [
-                    'country' => 'DE',
-                    'delivery_product' => 'fast'
-                ]
-            ])
+        $endpoint->send($batchId, (new BatchPostSendAttributes())
+            ->setDeliveryProduct('cheap')
             ->setPrintMode('simplex')
             ->setPrintSpectrum('color')
         );
@@ -388,10 +381,122 @@ class BatchEndpointTest extends EndpointTestBase
                     sprintf('%s/organisations/%s/batches/%s/send', $endpoint->getResourceBaseUrl(), $organisationId, $batchId),
                     $request->url()
                 );
+                $this->assertEquals(BatchPostSendAttributes::TYPE, $request->data()['data']['type']);
+                $this->assertEquals(
+                    [
+                        'delivery_product' => 'cheap',
+                        'print_mode' => 'simplex',
+                        'print_spectrum' => 'color',
+                    ],
+                    $request->data()['data']['attributes']
+                );
             }
         );
 
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testSendEmailChannel(): void
+    {
+        $batchId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push($this->batchDetailsResponse($batchId, 'email'), Response::HTTP_OK);
+
+        $endpoint->send($batchId, new BatchEmailSendAttributes());
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request): void {
+                $this->assertEquals(BatchEmailSendAttributes::TYPE, $request->data()['data']['type']);
+                $this->assertEquals(
+                    ['delivery_product' => 'electronic_email'],
+                    $request->data()['data']['attributes']
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testSendEbillChannel(): void
+    {
+        $batchId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push($this->batchDetailsResponse($batchId, 'ebill'), Response::HTTP_OK);
+
+        $endpoint->send($batchId, new BatchEbillSendAttributes());
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request): void {
+                $this->assertEquals(BatchEbillSendAttributes::TYPE, $request->data()['data']['type']);
+                $this->assertEquals(
+                    ['delivery_product' => 'electronic_ebill'],
+                    $request->data()['data']['attributes']
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testSendPostChannelValidation(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        try {
+            $endpoint->send('exampleId', (new BatchPostSendAttributes())
+                ->setDeliveryProduct('electronic_email')
+                ->setPrintMode('triplex')
+                ->setPrintSpectrum('sepia')
+            );
+
+            $this->fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertStringContainsString(
+                'The delivery_product field must be one of: fast, cheap, bulk, premium, registered.',
+                $e->getMessage()
+            );
+            $this->assertStringContainsString('The print_mode field must be one of: simplex, duplex.', $e->getMessage());
+            $this->assertStringContainsString('The print_spectrum field must be one of: color, grayscale.', $e->getMessage());
+        }
+    }
+
+    public function testSendEmailChannelRejectsForeignDeliveryProduct(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        try {
+            $endpoint->send('exampleId', (new BatchEmailSendAttributes())->setDeliveryProduct('cheap'));
+
+            $this->fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertStringContainsString('The delivery_product field must be electronic_email.', $e->getMessage());
+        }
+    }
+
+    public function testSendEbillChannelRejectsForeignDeliveryProduct(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        try {
+            $endpoint->send('exampleId', (new BatchEbillSendAttributes())->setDeliveryProduct('cheap'));
+
+            $this->fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertStringContainsString('The delivery_product field must be electronic_ebill.', $e->getMessage());
+        }
     }
 
     public function testEdit(): void
@@ -487,6 +592,14 @@ class BatchEndpointTest extends EndpointTestBase
                     sprintf('%s/organisations/%s/batches/%s', $endpoint->getResourceBaseUrl(), $organisationId, $batchId),
                     $request->url()
                 );
+                $this->assertEquals(
+                    [
+                        'id' => $batchId,
+                        'type' => 'batches',
+                        'attributes' => ['with_letters' => false, 'with_deliverables' => false],
+                    ],
+                    $request->data()['data']
+                );
             }
         );
 
@@ -573,5 +686,136 @@ class BatchEndpointTest extends EndpointTestBase
         );
 
         $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCreateWithChannelType(): void
+    {
+        $batchId = 'exampleId';
+        $organisationId = 'orgId';
+
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId($organisationId);
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push($this->batchDetailsResponse($batchId, 'ebill'), Response::HTTP_CREATED);
+
+        $endpoint->create((new BatchCreateAttributes())
+            ->setName('example batch')
+            ->setIcon('rocket')
+            ->setChannelType('ebill')
+            ->setFileOriginalName('lorem.pdf')
+            ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+            ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+            ->setAddressPosition('left')
+            ->setGroupingType('zip')
+        );
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request): void {
+                $this->assertEquals('ebill', $request->data()['data']['attributes']['channel_type']);
+                $this->assertEquals('rocket', $request->data()['data']['attributes']['icon']);
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCreateRejectsUnknownChannelTypeAndIcon(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        try {
+            $endpoint->create((new BatchCreateAttributes())
+                ->setName('example batch')
+                ->setIcon('unicorn')
+                ->setChannelType('carrier-pigeon')
+                ->setFileOriginalName('lorem.pdf')
+                ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+                ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+                ->setAddressPosition('left')
+                ->setGroupingType('zip')
+            );
+
+            $this->fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertStringContainsString('The icon field must be one of: campaign, megaphone', $e->getMessage());
+            $this->assertStringContainsString('The channel_type field must be one of: post, ebill, email.', $e->getMessage());
+        }
+    }
+
+    public function testCreateRejectsTooShortName(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        try {
+            $endpoint->create((new BatchCreateAttributes())
+                ->setName('nope')
+                ->setIcon('campaign')
+                ->setFileOriginalName('lorem.pdf')
+                ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+                ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+                ->setAddressPosition('left')
+                ->setGroupingType('zip')
+            );
+
+            $this->fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertStringContainsString('The name field must be between 5 and 100 characters.', $e->getMessage());
+        }
+    }
+
+    public function testEditRejectsTooShortName(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        try {
+            $endpoint->edit('exampleId', (new BatchEditAttributes())->setName('nope'));
+
+            $this->fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertStringContainsString('The name field must be between 5 and 100 characters.', $e->getMessage());
+        }
+    }
+
+    public function testEditRejectsUnknownIcon(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        try {
+            $endpoint->edit('exampleId', (new BatchEditAttributes())->setIcon('unicorn'));
+
+            $this->fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            $this->assertStringContainsString('The icon field must be one of:', $e->getMessage());
+        }
+    }
+
+    private function batchDetailsResponse(string $batchId, ?string $channelType = null): string
+    {
+        return (string) json_encode([
+            'data' => new BatchDetailsData([
+                'id' => $batchId,
+                'type' => 'batches',
+                'attributes' => new BatchAttributes([
+                    'name' => 'example batch',
+                    'icon' => 'campaign',
+                    'channel_type' => $channelType,
+                    'status' => 'sent',
+                    'file_original_name' => 'uploaded.zip',
+                    'letter_count' => 21,
+                    'address_position' => 'left',
+                    'price_currency' => 'CHF',
+                    'price_value' => 1.25,
+                    'print_mode' => 'simplex',
+                    'print_spectrum' => 'color',
+                    'created_at' => '2020-11-19T09:42:48+0100',
+                    'updated_at' => '2020-11-19T09:42:48+0100'
+                ])
+            ])
+        ]);
     }
 }

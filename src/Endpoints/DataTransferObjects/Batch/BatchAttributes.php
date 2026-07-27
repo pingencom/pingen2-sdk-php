@@ -13,11 +13,18 @@ class BatchAttributes extends DataTransferObject
 
     public string $icon;
 
+    public ?string $channel_type;
+
     public string $status;
 
     public string $file_original_name;
 
+    /**
+     * @deprecated The api replaced this with deliverable_count, use that one instead.
+     */
     public ?int $letter_count;
+
+    public ?int $deliverable_count;
 
     public string $address_position;
 

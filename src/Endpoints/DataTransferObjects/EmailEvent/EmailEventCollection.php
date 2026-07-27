@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill;
+namespace Pingen\Endpoints\DataTransferObjects\EmailEvent;
 
 use Pingen\Endpoints\DataTransferObjects\General\CollectionLinks;
 use Pingen\Endpoints\DataTransferObjects\General\CollectionMeta;
 use Pingen\Support\DataTransferObject\DataTransferObject;
 
 /**
- * @package Pingen\DataTransferObjects\Deliveries\Ebill
+ * Class EmailEventCollection
+ * @package Pingen\Endpoints\DataTransferObjects\EmailEvent
  */
-class EbillCollection extends DataTransferObject
+class EmailEventCollection extends DataTransferObject
 {
     /**
-     * @var \Pingen\Endpoints\DataTransferObjects\Deliveries\Ebill\EbillCollectionItem[]
+     * @var \Pingen\Endpoints\DataTransferObjects\EmailEvent\EmailEventCollectionItem[]
      */
     public array $data;
 
@@ -22,8 +23,5 @@ class EbillCollection extends DataTransferObject
 
     public CollectionMeta $meta;
 
-    /**
-     * @var \Pingen\Endpoints\DataTransferObjects\Organisation\OrganisationIncluded[]|null
-     */
     public ?array $included;
 }

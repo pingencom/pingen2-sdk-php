@@ -46,6 +46,45 @@ $lettersEndpoint->uploadAndCreate(
 );
 ```
 
+# Batches
+
+A batch is created for a channel (`post`, `ebill` or `email`) and sending it takes the attributes of that channel:
+
+```php
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchCreateAttributes;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchEbillSendAttributes;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchEmailSendAttributes;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchPostSendAttributes;
+
+$batchesEndpoint = (new \Pingen\Endpoints\BatchesEndpoint($access_token))
+    ->setOrganisationId('INSERT_YOUR_ORGANISATION_UUID_HERE')
+    ->useStaging();
+
+$batch = $batchesEndpoint->uploadAndCreate(
+    (new BatchCreateAttributes())
+        ->setName('My campaign')                         // 5 - 100 characters
+        ->setIcon('rocket')
+        ->setChannelType('post')
+        ->setFileOriginalName('your_original_pdf_name.pdf')
+        ->setAddressPosition('left')
+        ->setGroupingType('merge'),
+    fopen('path_to_your_original_pdf_name.pdf', 'r')
+);
+
+// post
+$batchesEndpoint->send($batch->data->id, (new BatchPostSendAttributes())
+    ->setDeliveryProduct('cheap')
+    ->setPrintMode('simplex')
+    ->setPrintSpectrum('color')
+);
+
+// email / ebill, the delivery product is fixed
+$batchesEndpoint->send($batch->data->id, new BatchEmailSendAttributes());
+$batchesEndpoint->send($batch->data->id, new BatchEbillSendAttributes());
+```
+
+The allowed values are constants on the attribute objects themselves: `BatchCreateAttributes::ICONS`, `BatchCreateAttributes::CHANNEL_TYPES`, `BatchPostSendAttributes::DELIVERY_PRODUCTS`, `::PRINT_MODES` and `::PRINT_SPECTRUMS`. They are checked in `validate()` before the request goes out.
+
 # Examples & Docs
 
 Our API Docs are here: https://api.pingen.com/documentation
@@ -68,6 +107,10 @@ In your automation or procedure you can always safely update patch & minor versi
 # Testing
 
 PHPUnit: `vendor/bin/phpunit`
+
+Integration tests run against the real staging api and are therefore kept in their own suite: `vendor/bin/phpunit --testsuite integration`
+
+They need staging credentials - copy `.env.example` to `.env` and fill it in (or export the same variables, they take precedence). Without credentials the whole suite is skipped.
 
 ECS: `vendor/bin/ecs check src`
 
