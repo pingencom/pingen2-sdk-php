@@ -1,0 +1,14 @@
+version: '3.4'
+services:
+  php8:
+    image: php:8.3-fpm
+    volumes:
+      - ./:/var/www:cached
+    working_dir: /var/www
+## If you want to use composer, inside container execute:
+## apt-get update && apt-get install git zip libzip-dev
+
+
+## self hosted docker version
+## docker run --rm -it -v $PWD:/var/www -w /var/www/examples/AuthorizationCode/ -p 7000:80 php php -S 0.0.0.0:80
+## and in browser go to: http://localhost/InteractiveAuthorizationProcess:7000
