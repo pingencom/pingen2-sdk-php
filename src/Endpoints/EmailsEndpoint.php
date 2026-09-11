@@ -132,6 +132,47 @@ class EmailsEndpoint extends ResourceEndpoint
         );
     }
 
+    /**
+     * @param string $emailId
+     * @return void
+     * @throws RateLimitJsonApiException
+     * @throws RequestException
+     */
+    public function cancel(string $emailId): void
+    {
+        $this->performPatchRequest(
+            sprintf('/organisations/%s/deliveries/emails/%s/cancel', $this->getOrganisationId(), $emailId),
+            'emails',
+            $emailId
+        );
+    }
+
+    /**
+     * @param string $emailId
+     * @return void
+     * @throws RateLimitJsonApiException
+     * @throws RequestException
+     */
+    public function delete(string $emailId): void
+    {
+        $this->performDeleteRequest(
+            sprintf('/organisations/%s/deliveries/emails/%s', $this->getOrganisationId(), $emailId)
+        );
+    }
+
+    /**
+     * @param string $emailId
+     * @return resource
+     * @throws RateLimitJsonApiException
+     * @throws RequestException
+     */
+    public function getFile(string $emailId)
+    {
+        return $this->performGetFileRequest(
+            sprintf('/organisations/%s/deliveries/emails/%s/file', $this->getOrganisationId(), $emailId)
+        );
+    }
+
     protected function getFileUploadEndpoint(): FileUploadEndpoint
     {
         return new FileUploadEndpoint($this->getAccessToken());

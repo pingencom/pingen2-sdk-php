@@ -182,6 +182,30 @@ abstract class ResourceEndpoint
     }
 
     /**
+     * Downloads the file behind the given endpoint into a temporary file.
+     *
+     * @param string $endpoint
+     * @return resource
+     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RateLimitJsonApiException
+     */
+    protected function performGetFileRequest(string $endpoint)
+    {
+        $response = $this->performGetRequest($endpoint);
+
+        $tmpFile = tmpfile();
+
+        if (! is_resource($tmpFile)) {
+            throw new \RuntimeException('Cannot create tmp file.'); // @codeCoverageIgnore
+        }
+
+        fwrite($tmpFile, $response->body());
+        rewind($tmpFile);
+
+        return $tmpFile;
+    }
+
+    /**
      * @param string $endpoint
      * @param string $type
      * @param Input $body
@@ -250,6 +274,71 @@ abstract class ResourceEndpoint
             ->patch(
                 $this->getResourceBaseUrl() . $endpoint,
                 $data
+            );
+
+        return $this->setOnErrorCallbackForJsonApiResponses($response);
+    }
+
+    /**
+     * Delete request carrying the resource identifier, for endpoints that expect
+     * the json api data envelope instead of an empty body.
+     *
+     * @param string $endpoint
+     * @param string $type
+     * @param string $id
+     * @param array $attributes
+     * @return Response
+     * @throws JsonApiException
+     */
+    protected function performDeleteIdentifierRequest(
+        string $endpoint,
+        string $type,
+        string $id,
+        array $attributes = []
+    ): Response {
+        $data = [
+            'id' => $id,
+            'type' => $type,
+        ];
+
+        if ($attributes !== []) {
+            $data['attributes'] = $attributes;
+        }
+
+        /** @var Response $response */
+        $response = $this->getAuthenticatedJsonApiRequest()
+            ->delete(
+                $this->getResourceBaseUrl() . $endpoint,
+                [
+                    'data' => $data,
+                ]
+            );
+
+        return $this->setOnErrorCallbackForJsonApiResponses($response);
+    }
+
+    /**
+     * Patch request carrying only the resource identifier, for endpoints that
+     * take no attributes but still expect the json api data envelope.
+     *
+     * @param string $endpoint
+     * @param string $type
+     * @param string $id
+     * @return Response
+     * @throws JsonApiException
+     */
+    protected function performPatchIdentifierRequest(string $endpoint, string $type, string $id): Response
+    {
+        /** @var Response $response */
+        $response = $this->getAuthenticatedJsonApiRequest()
+            ->patch(
+                $this->getResourceBaseUrl() . $endpoint,
+                [
+                    'data' => [
+                        'id' => $id,
+                        'type' => $type,
+                    ],
+                ]
             );
 
         return $this->setOnErrorCallbackForJsonApiResponses($response);

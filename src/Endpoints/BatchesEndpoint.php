@@ -6,12 +6,12 @@ namespace Pingen\Endpoints;
 
 use Illuminate\Http\Client\RequestException;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchAddAttachmentAttributes;
+use Pingen\Endpoints\DataTransferObjects\Batch\BatchChannelSendAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchCollection;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchCollectionItem;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchCreateAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchDetails;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchEditAttributes;
-use Pingen\Endpoints\DataTransferObjects\Batch\BatchSendAttributes;
 use Pingen\Endpoints\DataTransferObjects\Batch\BatchStatistics;
 use Pingen\Endpoints\ParameterBags\BatchCollectionParameterBag;
 use Pingen\Endpoints\ParameterBags\BatchParameterBag;
@@ -136,21 +136,24 @@ class BatchesEndpoint extends ResourceEndpoint
     }
 
     /**
+     * The attributes decide which channel the batch is sent through, see
+     * BatchPostSendAttributes, BatchEmailSendAttributes and BatchEbillSendAttributes.
+     *
      * @param string $batchId
-     * @param BatchSendAttributes $batchesSendAttributes
+     * @param BatchChannelSendAttributes $batchesSendAttributes
      * @return BatchDetails
      * @throws JsonApiException
      * @throws ValidationException
      * @throws \ReflectionException
      */
-    public function send(string $batchId, BatchSendAttributes $batchesSendAttributes): BatchDetails
+    public function send(string $batchId, BatchChannelSendAttributes $batchesSendAttributes): BatchDetails
     {
         $batchesSendAttributes->validate();
 
         return new BatchDetails(
             $this->performPatchRequest(
                 sprintf('/organisations/%s/batches/%s/send', $this->getOrganisationId(), $batchId),
-                'batches',
+                $batchesSendAttributes->getType(),
                 $batchId,
                 $batchesSendAttributes
             )->json()
@@ -162,9 +165,13 @@ class BatchesEndpoint extends ResourceEndpoint
      * @param BatchEditAttributes $batchEditAttributes
      * @return BatchDetails
      * @throws JsonApiException
+     * @throws ValidationException
+     * @throws \ReflectionException
      */
     public function edit(string $batchId, BatchEditAttributes $batchEditAttributes): BatchDetails
     {
+        $batchEditAttributes->validate();
+
         return new BatchDetails(
             $this->performPatchRequest(
                 sprintf('/organisations/%s/batches/%s', $this->getOrganisationId(), $batchId),
@@ -191,15 +198,25 @@ class BatchesEndpoint extends ResourceEndpoint
     }
 
     /**
+     * with_letters is the deprecated duplicate of with_deliverables, both are
+     * sent with the same value until the api drops the old one.
+     *
      * @param string $batchId
+     * @param bool $withDeliverables Delete the deliverables contained in the batch as well
      * @return void
      * @throws RateLimitJsonApiException
      * @throws RequestException
      */
-    public function delete(string $batchId): void
+    public function delete(string $batchId, bool $withDeliverables = false): void
     {
-        $this->performDeleteRequest(
-            sprintf('/organisations/%s/batches/%s', $this->getOrganisationId(), $batchId)
+        $this->performDeleteIdentifierRequest(
+            sprintf('/organisations/%s/batches/%s', $this->getOrganisationId(), $batchId),
+            'batches',
+            $batchId,
+            [
+                'with_letters' => $withDeliverables,
+                'with_deliverables' => $withDeliverables,
+            ]
         );
     }
 

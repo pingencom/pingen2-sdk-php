@@ -1,0 +1,7 @@
+services:
+  php:
+    build: .
+    image: pingen2-sdk-php
+    volumes:
+      - ./:/var/www:cached
+    working_dir: /var/www

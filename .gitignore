@@ -1,8 +1,8 @@
 .idea/
+.env
 .phpunit.cache/
 vendor/
-/composer.phar
 coverage/
 composer.lock
-composer.phar
-docker-compose.yml
+/.phpunit.result.cache
+.DS_Store

@@ -1,8 +1,8 @@
 # Requirements
 
-You need to have an account in pingen v2 and obtain oauth credentials for your desired grant type (usually client_credentials).
+You need to have an account in Pingen and obtain OAuth credentials for your desired grant type (usually client_credentials).
 
-How to obtain these are described here: https://api.pingen.com/documentation#section/Authentication/How-to-obtain-a-Client-ID
+How to obtain these, are described here: https://api.pingen.com/documentation#section/Authentication/How-to-obtain-a-Client-ID
 
 # Installation
 
@@ -54,7 +54,7 @@ On the right-hand side of every endpoint you can see request samples for PHP and
 
 # Bugreport & Contribution
 
-If you find a bug, please either create a ticket in github, or initiate a pull request.
+If you find a bug, please either create a ticket in GitHub, or initiate a pull request.
 
 # Versioning
 
@@ -67,10 +67,51 @@ In your automation or procedure you can always safely update patch & minor versi
 
 # Testing
 
-PHPUnit: `vendor/bin/phpunit`
+There are two test suites in `phpunit.xml`:
 
-ECS: `vendor/bin/ecs check src`
+* **default** – Fast, Offline unit tests (HTTP is mocked). This is what CI runs on every change and it does not require credentials.
+* **integration** – talks to the **real Pingen Staging API**. Is excluded from running in CI and every test is tagged `#[Group('integration')]`.
 
-PHPStan: `vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=512M`
+Prepare the docker image and composer:
 
-Lint: `vendor/bin/parallel-lint --exclude vendor .`
+```
+docker-compose build
+docker-compose run --rm php composer install
+```
+
+Running the unit tests (Http Mocked)
+
+```
+docker-compose run --rm php vendor/bin/phpunit
+```
+
+Running the integration tests (Live calls against Pingen Staging API, Credentials required in .env)
+
+```
+# Run whole integration suite
+docker-compose run --rm php vendor/bin/phpunit --testsuite integration
+
+# Run a single integration test file
+docker-compose run --rm php vendor/bin/phpunit tests/Integration/LettersIntegrationTest.php
+
+# Run a single test method
+docker-compose run --rm php vendor/bin/phpunit --filter testCreateLetter
+```
+
+## Integration test Credentials
+
+Credentials come from a `.env` file in the repository root (copy `.env.example` and replace with your values)
+
+Without `PINGEN2_CLIENT_ID` / `PINGEN2_CLIENT_SECRET` the whole integration suite is **skipped** (not failed).
+
+## Static analysis and style
+
+```
+docker-compose run --rm php vendor/bin/parallel-lint --exclude vendor .
+docker-compose run --rm php vendor/bin/ecs check src
+docker-compose run --rm php vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=512M
+```
+
+## Testing without Docker
+
+We highly recommend to use our prepared docker image for running tests to ensure all necessary packages and versions are available. However if you prefer you can always install anything necessary locally and run all commands without the `docker-compose run --rm php` prefix
