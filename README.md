@@ -106,14 +106,61 @@ In your automation or procedure you can always safely update patch & minor versi
 
 # Testing
 
-PHPUnit: `vendor/bin/phpunit`
+The suite is split in two in `phpunit.xml`:
 
-Integration tests run against the real staging api and are therefore kept in their own suite: `vendor/bin/phpunit --testsuite integration`
+* **default** – fast, offline unit tests (http is mocked). This is what `vendor/bin/phpunit` and CI run, and it needs no credentials.
+* **integration** – talks to the **real Pingen staging api**. Lives in `tests/Integration`, is excluded from the default suite and every test is tagged `#[Group('integration')]`.
 
-They need staging credentials - copy `.env.example` to `.env` and fill it in (or export the same variables, they take precedence). Without credentials the whole suite is skipped.
+## Unit tests (default suite)
 
-ECS: `vendor/bin/ecs check src`
+```
+vendor/bin/phpunit
+```
 
-PHPStan: `vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=512M`
+## Integration tests
 
-Lint: `vendor/bin/parallel-lint --exclude vendor .`
+These create, read and cancel **real** resources on staging (letters, batches, emails, ebills, webhooks) and include short waits while the api settles, so they are noticeably slower than the unit suite.
+
+Credentials come from a `.env` file in the repository root (copy `.env.example` and fill it in) or from real environment variables, which take precedence so CI can inject secrets without writing a file:
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `PINGEN2_CLIENT_ID` | yes | OAuth client id (`client_credentials` grant) |
+| `PINGEN2_CLIENT_SECRET` | yes | OAuth client secret |
+| `PINGEN2_ORGANIZATION_ID` | no | Organisation to use; when empty the account's first organisation is picked |
+| `PINGEN2_ORGANIZATION_NAME` | no | When set, the organisation test asserts on this name |
+| `PINGEN2_USE_STAGING` | no | Defaults to `true`; integration tests must never run against production |
+
+Without `PINGEN2_CLIENT_ID` / `PINGEN2_CLIENT_SECRET` the whole integration suite is **skipped** (not failed).
+
+```
+# whole integration suite
+vendor/bin/phpunit --testsuite integration
+
+# a single integration test file
+vendor/bin/phpunit tests/Integration/LettersIntegrationTest.php
+
+# a single test method
+vendor/bin/phpunit --filter testCreateLetter
+```
+
+Coverage is collected on every run and needs a driver (`pcov`, baked into the Docker image; CI uses it too). Without one PHPUnit aborts with *"No tests executed!"* — add `--no-coverage` to run without it, which also speeds integration runs up.
+
+## Static analysis & style
+
+```
+vendor/bin/parallel-lint --exclude vendor .                      # lint
+vendor/bin/ecs check src                                         # coding standard (add --fix to apply)
+vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=512M   # static analysis
+```
+
+## In Docker
+
+Composer and the PHP runtime are baked into the image (see `Dockerfile`), so no local PHP install is needed:
+
+```
+docker-compose build
+docker-compose run --rm php8 composer install
+docker-compose run --rm php8 vendor/bin/phpunit
+docker-compose run --rm php8 vendor/bin/phpunit --testsuite integration   # needs .env with staging credentials
+```

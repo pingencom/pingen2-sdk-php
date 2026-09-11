@@ -1,13 +1,13 @@
-version: '3.4'
 services:
   php8:
-    image: php:8.3-fpm
+    build: .
     volumes:
       - ./:/var/www:cached
     working_dir: /var/www
-## If you want to use composer, inside container execute:
-## apt-get update && apt-get install git zip libzip-dev
 
+## Composer is baked into the image now. Inside the container just run e.g.:
+##   docker compose run --rm php8 composer install
+##   docker compose run --rm php8 vendor/bin/phpunit
 
 ## self hosted docker version
 ## docker run --rm -it -v $PWD:/var/www -w /var/www/examples/AuthorizationCode/ -p 7000:80 php php -S 0.0.0.0:80

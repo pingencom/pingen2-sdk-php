@@ -2,7 +2,6 @@
 .env
 .phpunit.cache/
 vendor/
-/composer.phar
 coverage/
 composer.lock
-composer.phar
+/.phpunit.result.cache
