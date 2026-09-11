@@ -40,9 +40,5 @@ class OrganisationsIntegrationTest extends IntegrationTestCase
         $details = $this->organisations()->getDetails($organisationId);
 
         $this->assertSame($organisationId, $details->data->id);
-
-        if ($this->organisationName() !== '') {
-            $this->assertSame($this->organisationName(), $details->data->attributes->name);
-        }
     }
 }

@@ -87,8 +87,6 @@ abstract class IntegrationTestCase extends TestCase
             'PINGEN2_CLIENT_ID',
             'PINGEN2_CLIENT_SECRET',
             'PINGEN2_ORGANIZATION_ID',
-            'PINGEN2_ORGANIZATION_NAME',
-            'PINGEN2_USE_STAGING',
         ] as $key) {
             $fromEnvironment = getenv($key);
 
@@ -98,16 +96,6 @@ abstract class IntegrationTestCase extends TestCase
         }
 
         return self::$credentials = $credentials;
-    }
-
-    /**
-     * Integration tests must never run against production.
-     */
-    protected static function useStaging(): bool
-    {
-        $raw = strtolower(trim(self::credentials()['PINGEN2_USE_STAGING'] ?: 'true'));
-
-        return ! in_array($raw, ['0', 'false', 'no', 'off'], true);
     }
 
     /**
@@ -129,7 +117,7 @@ abstract class IntegrationTestCase extends TestCase
         $provider = new Pingen([
             'clientId' => $credentials['PINGEN2_CLIENT_ID'],
             'clientSecret' => $credentials['PINGEN2_CLIENT_SECRET'],
-            'staging' => self::useStaging(),
+            'staging' => true,
         ]);
 
         return $provider->getAccessToken('client_credentials', ['scope' => self::SCOPE]);
@@ -152,11 +140,6 @@ abstract class IntegrationTestCase extends TestCase
         $this->assertNotEmpty($collection->data, 'No organisations returned - check the staging credentials.');
 
         return self::$organisationId = $collection->data[0]->id;
-    }
-
-    protected function organisationName(): string
-    {
-        return self::credentials()['PINGEN2_ORGANIZATION_NAME'];
     }
 
     protected function organisations(): OrganisationsEndpoint
@@ -235,10 +218,7 @@ abstract class IntegrationTestCase extends TestCase
     protected function endpoint(string $endpoint): ResourceEndpoint
     {
         $instance = new $endpoint(self::accessToken());
-
-        if (self::useStaging()) {
-            $instance->useStaging();
-        }
+        $instance->useStaging();
 
         return $instance;
     }
