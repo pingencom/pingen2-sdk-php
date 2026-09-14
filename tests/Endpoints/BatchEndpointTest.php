@@ -27,7 +27,6 @@ use Pingen\Endpoints\ParameterBags\BatchParameterBag;
 use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\JsonApiExceptionError;
 use Pingen\Exceptions\JsonApiExceptionErrorSource;
-use Pingen\Exceptions\ValidationException;
 
 class BatchEndpointTest extends EndpointTestBase
 {
@@ -221,17 +220,19 @@ class BatchEndpointTest extends EndpointTestBase
 
     public function testCreateValidation(): void
     {
-        $batchId = 'exampleId';
-        $organisationId = 'orgId';
-
         $endpoint = (new BatchesEndpoint($this->getAccessToken()))
-            ->setOrganisationId($organisationId);
+            ->setOrganisationId('orgId');
 
-        try {
-            $endpoint->create((new BatchCreateAttributes()));
-        } catch (ValidationException $e) {
-            $this->assertEquals('["The name field is required.","The icon field is required.","The file_original_name field is required.","The file_url field is required.","The file_url_signature field is required.","The address_position field is required.","The grouping_type field is required."]', $e->getMessage());
-        }
+        $this->assertValidationFails(
+            fn () => $endpoint->create(new BatchCreateAttributes()),
+            'The name field is required.',
+            'The icon field is required.',
+            'The file_original_name field is required.',
+            'The file_url field is required.',
+            'The file_url_signature field is required.',
+            'The address_position field is required.',
+            'The grouping_type field is required.',
+        );
     }
 
     public function testCreateAndUpload(): void
@@ -453,22 +454,15 @@ class BatchEndpointTest extends EndpointTestBase
         $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('orgId');
 
-        try {
-            $endpoint->send('exampleId', (new BatchPostSendAttributes())
+        $this->assertValidationFails(
+            fn () => $endpoint->send('exampleId', (new BatchPostSendAttributes())
                 ->setDeliveryProduct('electronic_email')
                 ->setPrintMode('triplex')
-                ->setPrintSpectrum('sepia')
-            );
-
-            $this->fail('Expected a ValidationException');
-        } catch (ValidationException $e) {
-            $this->assertStringContainsString(
-                'The delivery_product field must be one of: fast, cheap, bulk, premium, registered.',
-                $e->getMessage()
-            );
-            $this->assertStringContainsString('The print_mode field must be one of: simplex, duplex.', $e->getMessage());
-            $this->assertStringContainsString('The print_spectrum field must be one of: color, grayscale.', $e->getMessage());
-        }
+                ->setPrintSpectrum('sepia')),
+            'The delivery_product field must be one of: fast, cheap, bulk, premium, registered.',
+            'The print_mode field must be one of: simplex, duplex.',
+            'The print_spectrum field must be one of: color, grayscale.',
+        );
     }
 
     public function testSendEmailChannelRejectsForeignDeliveryProduct(): void
@@ -476,13 +470,10 @@ class BatchEndpointTest extends EndpointTestBase
         $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('orgId');
 
-        try {
-            $endpoint->send('exampleId', (new BatchEmailSendAttributes())->setDeliveryProduct('cheap'));
-
-            $this->fail('Expected a ValidationException');
-        } catch (ValidationException $e) {
-            $this->assertStringContainsString('The delivery_product field must be electronic_email.', $e->getMessage());
-        }
+        $this->assertValidationFails(
+            fn () => $endpoint->send('exampleId', (new BatchEmailSendAttributes())->setDeliveryProduct('cheap')),
+            'The delivery_product field must be electronic_email.',
+        );
     }
 
     public function testSendEbillChannelRejectsForeignDeliveryProduct(): void
@@ -490,13 +481,10 @@ class BatchEndpointTest extends EndpointTestBase
         $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('orgId');
 
-        try {
-            $endpoint->send('exampleId', (new BatchEbillSendAttributes())->setDeliveryProduct('cheap'));
-
-            $this->fail('Expected a ValidationException');
-        } catch (ValidationException $e) {
-            $this->assertStringContainsString('The delivery_product field must be electronic_ebill.', $e->getMessage());
-        }
+        $this->assertValidationFails(
+            fn () => $endpoint->send('exampleId', (new BatchEbillSendAttributes())->setDeliveryProduct('cheap')),
+            'The delivery_product field must be electronic_ebill.',
+        );
     }
 
     public function testEdit(): void
@@ -725,8 +713,8 @@ class BatchEndpointTest extends EndpointTestBase
         $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('orgId');
 
-        try {
-            $endpoint->create((new BatchCreateAttributes())
+        $this->assertValidationFails(
+            fn () => $endpoint->create((new BatchCreateAttributes())
                 ->setName('example batch')
                 ->setIcon('unicorn')
                 ->setChannelType('carrier-pigeon')
@@ -734,14 +722,10 @@ class BatchEndpointTest extends EndpointTestBase
                 ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
                 ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
                 ->setAddressPosition('left')
-                ->setGroupingType('zip')
-            );
-
-            $this->fail('Expected a ValidationException');
-        } catch (ValidationException $e) {
-            $this->assertStringContainsString('The icon field must be one of: campaign, megaphone', $e->getMessage());
-            $this->assertStringContainsString('The channel_type field must be one of: post, ebill, email.', $e->getMessage());
-        }
+                ->setGroupingType('zip')),
+            'The icon field must be one of: campaign, megaphone',
+            'The channel_type field must be one of: post, ebill, email.',
+        );
     }
 
     public function testCreateRejectsTooShortName(): void
@@ -749,21 +733,17 @@ class BatchEndpointTest extends EndpointTestBase
         $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('orgId');
 
-        try {
-            $endpoint->create((new BatchCreateAttributes())
+        $this->assertValidationFails(
+            fn () => $endpoint->create((new BatchCreateAttributes())
                 ->setName('nope')
                 ->setIcon('campaign')
                 ->setFileOriginalName('lorem.pdf')
                 ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
                 ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
                 ->setAddressPosition('left')
-                ->setGroupingType('zip')
-            );
-
-            $this->fail('Expected a ValidationException');
-        } catch (ValidationException $e) {
-            $this->assertStringContainsString('The name field must be between 5 and 100 characters.', $e->getMessage());
-        }
+                ->setGroupingType('zip')),
+            'The name field must be between 5 and 100 characters.',
+        );
     }
 
     public function testEditRejectsTooShortName(): void
@@ -771,13 +751,10 @@ class BatchEndpointTest extends EndpointTestBase
         $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('orgId');
 
-        try {
-            $endpoint->edit('exampleId', (new BatchEditAttributes())->setName('nope'));
-
-            $this->fail('Expected a ValidationException');
-        } catch (ValidationException $e) {
-            $this->assertStringContainsString('The name field must be between 5 and 100 characters.', $e->getMessage());
-        }
+        $this->assertValidationFails(
+            fn () => $endpoint->edit('exampleId', (new BatchEditAttributes())->setName('nope')),
+            'The name field must be between 5 and 100 characters.',
+        );
     }
 
     public function testEditRejectsUnknownIcon(): void
@@ -785,13 +762,10 @@ class BatchEndpointTest extends EndpointTestBase
         $endpoint = (new BatchesEndpoint($this->getAccessToken()))
             ->setOrganisationId('orgId');
 
-        try {
-            $endpoint->edit('exampleId', (new BatchEditAttributes())->setIcon('unicorn'));
-
-            $this->fail('Expected a ValidationException');
-        } catch (ValidationException $e) {
-            $this->assertStringContainsString('The icon field must be one of:', $e->getMessage());
-        }
+        $this->assertValidationFails(
+            fn () => $endpoint->edit('exampleId', (new BatchEditAttributes())->setIcon('unicorn')),
+            'The icon field must be one of:',
+        );
     }
 
     private function batchDetailsResponse(string $batchId, ?string $channelType = null): string
