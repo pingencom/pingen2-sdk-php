@@ -70,6 +70,20 @@ class DataTransferObjectTest extends TestCase
             'mixed' => null
         ], $dto->all());
     }
+
+    public function testUntypedProperty(): void
+    {
+        $this->assertSame('whatever', (new UntypedPropertyDTO(['thing' => 'whatever']))->thing);
+        $this->assertNull((new UntypedPropertyDTO([]))->thing);
+    }
+
+    public function testNestedToArray(): void
+    {
+        $dto = new OuterDTO(['inner' => ['label' => 'value']]);
+
+        $this->assertInstanceOf(InnerDTO::class, $dto->inner);
+        $this->assertSame(['inner' => ['label' => 'value']], $dto->toArray());
+    }
 }
 
 class DummyDTO extends DataTransferObject
@@ -83,4 +97,19 @@ class DummyDTO extends DataTransferObject
     public mixed $mixed;
 
     protected bool $ignoreMissing = false;
+}
+
+class UntypedPropertyDTO extends DataTransferObject
+{
+    public $thing;
+}
+
+class InnerDTO extends DataTransferObject
+{
+    public string $label;
+}
+
+class OuterDTO extends DataTransferObject
+{
+    public InnerDTO $inner;
 }
