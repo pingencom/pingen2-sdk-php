@@ -31,6 +31,10 @@
     <source>
         <include>
             <directory suffix=".php">./src/</directory>
+            <directory suffix=".php">./tests/</directory>
         </include>
+        <exclude>
+            <directory suffix=".php">./tests/Integration/</directory>
+        </exclude>
     </source>
 </phpunit>
