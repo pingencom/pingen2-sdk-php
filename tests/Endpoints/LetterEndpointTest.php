@@ -28,7 +28,6 @@ use Pingen\Exceptions\JsonApiException;
 use Pingen\Exceptions\JsonApiExceptionError;
 use Pingen\Exceptions\JsonApiExceptionErrorSource;
 use Pingen\Exceptions\RateLimitJsonApiException;
-use Pingen\Exceptions\ValidationException;
 
 class LetterEndpointTest extends EndpointTestBase
 {
@@ -240,21 +239,20 @@ class LetterEndpointTest extends EndpointTestBase
 
     public function testCreateValidation(): void
     {
-        $organisationId = 'orgId';
-
         $endpoint = (new LettersEndpoint($this->getAccessToken()))
-            ->setOrganisationId($organisationId);
+            ->setOrganisationId('orgId');
 
-        try {
-            $endpoint->create((new LetterCreateAttributes())
+        $this->assertValidationFails(
+            fn () => $endpoint->create((new LetterCreateAttributes())
                 ->setFileOriginalName('lorem.pdf')
                 ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
                 ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
                 ->setAddressPosition('left')
-                ->setAutoSend(true));
-        } catch (ValidationException $e) {
-            $this->assertEquals('["When auto_send is set to true delivery_product field is required.","When auto_send is set to true print_mode field is required.","When auto_send is set to true print_spectrum field is required."]', $e->getMessage());
-        }
+                ->setAutoSend(true)),
+            'When auto_send is set to true delivery_product field is required.',
+            'When auto_send is set to true print_mode field is required.',
+            'When auto_send is set to true print_spectrum field is required.',
+        );
     }
 
     public function testCreateAndUpload(): void

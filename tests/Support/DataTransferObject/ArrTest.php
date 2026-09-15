@@ -62,6 +62,12 @@ class ArrTest extends TestCase
         $dto = new SimpleDTO(['status' => 'sent', 'name' => 'example']);
         $this->assertSame(['status' => 'sent', 'name' => 'example'], $dto->except('example.test')->toArray());
     }
+
+    public function testMissing(): void
+    {
+        $dto = new SimpleDTO(['status' => 'sent', 'name' => 'example']);
+        $this->assertSame(['status' => 'sent', 'name' => 'example'], $dto->except('missing')->toArray());
+    }
 }
 
 class SimpleDTO extends DataTransferObject

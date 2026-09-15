@@ -61,7 +61,7 @@ jobs:
       run: |
         vendor/bin/phpunit
         cat coverage/text
-        [ -z "$(cat coverage/text | grep 'Classes: 100.00%')" ] && echo ::warning::$(cat coverage/text)
+        if ! grep -q 'Classes: 100.00%' coverage/text; then echo "::warning::$(cat coverage/text)"; fi
 
     - name: Archive code coverage results
       uses: actions/upload-artifact@v7
@@ -69,11 +69,9 @@ jobs:
         name: code-coverage-report-${{ matrix.php }}
         path: coverage/html
 
-#    In future we will enforce 100% code coverage (with allowed @codeCoverageIgnore)
-#    When ready, enable clover in phpunit.xml
-#    - name: Check test coverage
-#      id: test-coverage
-#      uses: johanvanhelden/gha-clover-test-coverage-check@v1
-#      with:
-#        percentage: 100
-#        filename: ./coverage/clover.xml
+    - name: Check test coverage
+      id: test-coverage
+      uses: johanvanhelden/gha-clover-test-coverage-check@v1
+      with:
+        percentage: 100
+        filename: ./coverage/clover.xml

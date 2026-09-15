@@ -23,7 +23,7 @@
     </testsuites>
     <coverage>
         <report>
-            <!-- <clover outputFile="coverage/clover.xml"/>-->
+            <clover outputFile="coverage/clover.xml"/>
             <html outputDirectory="coverage/html" lowUpperBound="50" highLowerBound="90"/>
             <text outputFile="coverage/text" showUncoveredFiles="false" showOnlySummary="true"/>
         </report>
@@ -34,7 +34,6 @@
             <directory suffix=".php">./tests/</directory>
         </include>
         <exclude>
-            <file>./src/run.php</file>
             <directory suffix=".php">./tests/Integration/</directory>
         </exclude>
     </source>
