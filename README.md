@@ -48,9 +48,11 @@ $lettersEndpoint->uploadAndCreate(
 
 # Examples & Docs
 
-Our API Docs are here: https://api.pingen.com/documentation
+The integration tests, available in this repository, give you many examples and flows, which can provide a solid starting ground to use the SDK.
 
-On the right-hand side of every endpoint you can see request samples for PHP and other languages, which you can copy and paste into your application.
+For detailed research, documentation and examples, our API Docs are here: https://api.pingen.com/documentation
+
+On the right-hand side of every endpoint you can see request samples for all languages and SDKs, which you can copy and paste into your application.
 
 # Bugreport & Contribution
 
