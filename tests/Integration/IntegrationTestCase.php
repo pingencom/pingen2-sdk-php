@@ -27,8 +27,7 @@ use Tests\TestCase;
  * Base class for the tests that talk to the real Pingen staging api.
  *
  * Credentials are read from a .env file in the repository root (copy
- * .env.example and fill it in) or from real environment variables, which take
- * precedence so that ci can inject secrets without writing a file.
+ * .env.example and fill it in).
  *
  * @package Tests\Integration
  */
@@ -86,7 +85,7 @@ abstract class IntegrationTestCase extends TestCase
         foreach ([
             'PINGEN2_CLIENT_ID',
             'PINGEN2_CLIENT_SECRET',
-            'PINGEN2_ORGANIZATION_ID',
+            'PINGEN2_ORGANISATION_ID',
         ] as $key) {
             $fromEnvironment = getenv($key);
 
@@ -129,7 +128,7 @@ abstract class IntegrationTestCase extends TestCase
             return self::$organisationId;
         }
 
-        $configured = self::credentials()['PINGEN2_ORGANIZATION_ID'];
+        $configured = self::credentials()['PINGEN2_ORGANISATION_ID'];
 
         if ($configured !== '') {
             return self::$organisationId = $configured;
