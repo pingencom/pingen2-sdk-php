@@ -24,8 +24,6 @@ class OrganisationAttributes extends DataTransferObject
      */
     public $billing_balance;
 
-    public ?string $default_country;
-
     public ?string $default_address_position;
 
     public ?int $data_retention_addresses;

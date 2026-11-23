@@ -123,6 +123,7 @@ class BatchesIntegrationTest extends IntegrationTestCase
             ->setAddressPosition('left')
             ->setGroupingType('merge')
             ->setGroupingOptionsSplitType('qr_invoice')
-            ->setGroupingOptionsSplitSize(2);
+            ->setGroupingOptionsSplitSize(2)
+            ->setGroupingOptionsSplitPosition('last_page');
     }
 }
