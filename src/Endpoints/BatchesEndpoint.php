@@ -198,9 +198,6 @@ class BatchesEndpoint extends ResourceEndpoint
     }
 
     /**
-     * with_letters is the deprecated duplicate of with_deliverables, both are
-     * sent with the same value until the api drops the old one.
-     *
      * @param string $batchId
      * @param bool $withDeliverables Delete the deliverables contained in the batch as well
      * @return void
@@ -214,7 +211,6 @@ class BatchesEndpoint extends ResourceEndpoint
             'batches',
             $batchId,
             [
-                'with_letters' => $withDeliverables,
                 'with_deliverables' => $withDeliverables,
             ]
         );

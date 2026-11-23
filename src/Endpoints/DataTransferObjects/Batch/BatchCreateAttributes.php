@@ -19,6 +19,7 @@ use Pingen\Support\Input;
  * @method BatchCreateAttributes setGroupingOptionsSplitType(string $value)
  * @method BatchCreateAttributes setGroupingOptionsSplitSize(int $value)
  * @method BatchCreateAttributes setGroupingOptionsSplitSeparator(string $value)
+ * @method BatchCreateAttributes setGroupingOptionsSplitPosition(string $value)
  */
 class BatchCreateAttributes extends Input
 {
@@ -27,6 +28,10 @@ class BatchCreateAttributes extends Input
     public const NAME_MAX_LENGTH = 100;
 
     public const CHANNEL_TYPES = ['post', 'ebill', 'email'];
+
+    public const SPLIT_TYPES = ['file', 'page', 'custom', 'qr_invoice'];
+
+    public const SPLIT_POSITIONS = ['first_page', 'last_page'];
 
     public const ICONS = [
         'campaign',
@@ -69,6 +74,8 @@ class BatchCreateAttributes extends Input
 
     protected ?string $grouping_options_split_separator;
 
+    protected ?string $grouping_options_split_position;
+
     /**
      * @param string[] $excludedParameters
      * @return void
@@ -101,6 +108,14 @@ class BatchCreateAttributes extends Input
                 'The channel_type field must be one of: %s.',
                 implode(', ', self::CHANNEL_TYPES)
             );
+        }
+
+        if (isset($this->grouping_options_split_type) && ! in_array($this->grouping_options_split_type, self::SPLIT_TYPES, true)) {
+            $errorMsg[] = sprintf('The grouping_options_split_type field must be one of: %s.', implode(', ', self::SPLIT_TYPES));
+        }
+
+        if (isset($this->grouping_options_split_position) && ! in_array($this->grouping_options_split_position, self::SPLIT_POSITIONS, true)) {
+            $errorMsg[] = sprintf('The grouping_options_split_position field must be one of: %s.', implode(', ', self::SPLIT_POSITIONS));
         }
 
         if (count($errorMsg) > 0) {
