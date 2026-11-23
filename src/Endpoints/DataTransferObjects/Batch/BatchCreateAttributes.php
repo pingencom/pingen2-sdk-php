@@ -29,12 +29,9 @@ class BatchCreateAttributes extends Input
 
     public const CHANNEL_TYPES = ['post', 'ebill', 'email'];
 
-    public const SPLIT_POSITIONS = ['first_page', 'last_page'];
+    public const SPLIT_TYPES = ['file', 'page', 'custom', 'qr_invoice'];
 
-    /**
-     * Split types for which the api requires grouping_options_split_position.
-     */
-    public const SPLIT_TYPES_REQUIRING_POSITION = ['custom', 'qr_invoice'];
+    public const SPLIT_POSITIONS = ['first_page', 'last_page'];
 
     public const ICONS = [
         'campaign',
@@ -102,36 +99,23 @@ class BatchCreateAttributes extends Input
             );
         }
 
-        if (isset($this->icon) && ! in_array($this->icon, self::ICONS, true)) {
+        if (isset($this->icon) && !in_array($this->icon, self::ICONS, true)) {
             $errorMsg[] = sprintf('The icon field must be one of: %s.', implode(', ', self::ICONS));
         }
 
-        if (isset($this->channel_type) && ! in_array($this->channel_type, self::CHANNEL_TYPES, true)) {
+        if (isset($this->channel_type) && !in_array($this->channel_type, self::CHANNEL_TYPES, true)) {
             $errorMsg[] = sprintf(
                 'The channel_type field must be one of: %s.',
                 implode(', ', self::CHANNEL_TYPES)
             );
         }
 
-        if (
-            isset($this->grouping_options_split_position)
-            && ! in_array($this->grouping_options_split_position, self::SPLIT_POSITIONS, true)
-        ) {
-            $errorMsg[] = sprintf(
-                'The grouping_options_split_position field must be one of: %s.',
-                implode(', ', self::SPLIT_POSITIONS)
-            );
+        if (isset($this->grouping_options_split_type) && !in_array($this->grouping_options_split_type, self::SPLIT_TYPES, true)) {
+            $errorMsg[] = sprintf('The grouping_options_split_type field must be one of: %s.', implode(', ', self::SPLIT_TYPES));
         }
 
-        if (
-            isset($this->grouping_options_split_type)
-            && in_array($this->grouping_options_split_type, self::SPLIT_TYPES_REQUIRING_POSITION, true)
-            && ! isset($this->grouping_options_split_position)
-        ) {
-            $errorMsg[] = sprintf(
-                'The grouping_options_split_position field is required when grouping_options_split_type is %s.',
-                implode(' or ', self::SPLIT_TYPES_REQUIRING_POSITION)
-            );
+        if (isset($this->grouping_options_split_position) && !in_array($this->grouping_options_split_position, self::SPLIT_POSITIONS, true)) {
+            $errorMsg[] = sprintf('The grouping_options_split_position field must be one of: %s.', implode(', ', self::SPLIT_POSITIONS));
         }
 
         if (count($errorMsg) > 0) {
