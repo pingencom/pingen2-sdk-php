@@ -229,7 +229,7 @@ class EmailsEndpointTest extends EndpointTestBase
             ->push('', Response::HTTP_OK);
 
         $endpoint = $this->createPartialMock(EmailsEndpoint::class, ['getFileUploadEndpoint']);
-        $endpoint->method('getFileUploadEndpoint')->willReturn($fileUploadEndpoint);
+        $endpoint->expects($this->once())->method('getFileUploadEndpoint')->willReturn($fileUploadEndpoint);
         $endpoint->setAccessToken($this->getAccessToken())
              ->setHttpClient(new HttpClient());
         $endpoint->setOrganisationId($organisationId)

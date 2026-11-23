@@ -67,14 +67,14 @@ class PropertyFieldValidator extends FieldValidator
     private function normaliseTypes(?ReflectionType ...$types): array
     {
         return array_filter(array_map(
-            function (?ReflectionType $type) {
+            function (ReflectionType $type) {
                 if ($type instanceof ReflectionNamedType) {
                     $type = $type->getName();
                 }
 
                 return self::$typeMapping[$type] ?? $type; // @phpstan-ignore-line
             },
-            $types
+            array_filter($types)
         ));
     }
 }
