@@ -99,22 +99,22 @@ class BatchCreateAttributes extends Input
             );
         }
 
-        if (isset($this->icon) && !in_array($this->icon, self::ICONS, true)) {
+        if (isset($this->icon) && ! in_array($this->icon, self::ICONS, true)) {
             $errorMsg[] = sprintf('The icon field must be one of: %s.', implode(', ', self::ICONS));
         }
 
-        if (isset($this->channel_type) && !in_array($this->channel_type, self::CHANNEL_TYPES, true)) {
+        if (isset($this->channel_type) && ! in_array($this->channel_type, self::CHANNEL_TYPES, true)) {
             $errorMsg[] = sprintf(
                 'The channel_type field must be one of: %s.',
                 implode(', ', self::CHANNEL_TYPES)
             );
         }
 
-        if (isset($this->grouping_options_split_type) && !in_array($this->grouping_options_split_type, self::SPLIT_TYPES, true)) {
+        if (isset($this->grouping_options_split_type) && ! in_array($this->grouping_options_split_type, self::SPLIT_TYPES, true)) {
             $errorMsg[] = sprintf('The grouping_options_split_type field must be one of: %s.', implode(', ', self::SPLIT_TYPES));
         }
 
-        if (isset($this->grouping_options_split_position) && !in_array($this->grouping_options_split_position, self::SPLIT_POSITIONS, true)) {
+        if (isset($this->grouping_options_split_position) && ! in_array($this->grouping_options_split_position, self::SPLIT_POSITIONS, true)) {
             $errorMsg[] = sprintf('The grouping_options_split_position field must be one of: %s.', implode(', ', self::SPLIT_POSITIONS));
         }
 
