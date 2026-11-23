@@ -584,7 +584,7 @@ class BatchEndpointTest extends EndpointTestBase
                     [
                         'id' => $batchId,
                         'type' => 'batches',
-                        'attributes' => ['with_letters' => false, 'with_deliverables' => false],
+                        'attributes' => ['with_deliverables' => false],
                     ],
                     $request->data()['data']
                 );
@@ -725,6 +725,78 @@ class BatchEndpointTest extends EndpointTestBase
                 ->setGroupingType('zip')),
             'The icon field must be one of: campaign, megaphone',
             'The channel_type field must be one of: post, ebill, email.',
+        );
+    }
+
+    public function testCreateSendsSplitPosition(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        $endpoint->getHttpClient()->fakeSequence()
+            ->push($this->batchDetailsResponse('exampleId'), Response::HTTP_CREATED);
+
+        $endpoint->create((new BatchCreateAttributes())
+            ->setName('example batch')
+            ->setIcon('rocket')
+            ->setFileOriginalName('lorem.pdf')
+            ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+            ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+            ->setAddressPosition('left')
+            ->setGroupingType('merge')
+            ->setGroupingOptionsSplitType('custom')
+            ->setGroupingOptionsSplitSeparator('---')
+            ->setGroupingOptionsSplitPosition('first_page')
+        );
+
+        $endpoint->getHttpClient()->recorded(
+            function (Request $request): void {
+                $this->assertEquals(
+                    'first_page',
+                    $request->data()['data']['attributes']['grouping_options_split_position']
+                );
+            }
+        );
+
+        $this->assertCount(1, $endpoint->getHttpClient()->recorded());
+    }
+
+    public function testCreateRequiresSplitPositionForQrInvoiceSplit(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        $this->assertValidationFails(
+            fn () => $endpoint->create((new BatchCreateAttributes())
+                ->setName('example batch')
+                ->setIcon('rocket')
+                ->setFileOriginalName('lorem.pdf')
+                ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+                ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+                ->setAddressPosition('left')
+                ->setGroupingType('merge')
+                ->setGroupingOptionsSplitType('qr_invoice')),
+            'The grouping_options_split_position field is required when grouping_options_split_type is custom or qr_invoice.',
+        );
+    }
+
+    public function testCreateRejectsUnknownSplitPosition(): void
+    {
+        $endpoint = (new BatchesEndpoint($this->getAccessToken()))
+            ->setOrganisationId('orgId');
+
+        $this->assertValidationFails(
+            fn () => $endpoint->create((new BatchCreateAttributes())
+                ->setName('example batch')
+                ->setIcon('rocket')
+                ->setFileOriginalName('lorem.pdf')
+                ->setFileUrl('https =>//objects.cloudscale.ch/bucket/example')
+                ->setFileUrlSignature('$2y$10$JpVa0BVfKQmjpDk8MPNujOJ78AM1XLotY.JAjM4HFjpSRjUwqKPfq')
+                ->setAddressPosition('left')
+                ->setGroupingType('merge')
+                ->setGroupingOptionsSplitType('custom')
+                ->setGroupingOptionsSplitPosition('middle_page')),
+            'The grouping_options_split_position field must be one of: first_page, last_page.',
         );
     }
 
